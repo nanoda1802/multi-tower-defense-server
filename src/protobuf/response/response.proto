@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package response;
+
+enum GlobalFailCode {
+  NONE = 0;
+  UNKNOWN_ERROR = 1;
+  INVALID_REQUEST = 2;
+  AUTHENTICATION_FAILED = 3;
+}
+
+message Response {
+  ushort packetType = 1;
+  ubyte versionLength = 2;  
+  string version = 3; 
+  uint32 sequence = 4;
+  uint32 payloadLength = 5;
+  bytes payload = 6;
+}
+
+message S2CRegisterResponse {
+  bool success = 1;
+  string message = 2;
+  GlobalFailCode failCode = 3;
+}
+
+message S2CLoginResponse {
+  bool success = 1;
+  string message = 2;
+  string token = 3;
+  GlobalFailCode failCode = 4;
+}
+
+message S2CTowerPurchaseResponse {
+  int32 towerId = 1;
+}
+
+message S2CSpawnMonsterResponse {
+  int32 monsterId = 1; 
+  int32 monsterNumber = 2;
+}
