@@ -1,0 +1,48 @@
+const towerData = [
+  {
+    Rcode: TOW00001,
+    power: 40,
+    powerPerLv: 10,
+    range: 300,
+    coolDown: 180,
+    duration: 30,
+    cost: 3000,
+    extra: 1,
+    extraPerLv: 0.5,
+  },
+  {
+    Rcode: TOW00002,
+    power: 60,
+    powerPerLv: 15,
+    range: 400,
+    coolDown: 300,
+    duration: 0,
+    cost: 3000,
+    extra: 100,
+    extraPerLv: 0,
+  },
+  {
+    Rcode: TOW00003,
+    power: 20,
+    powerPerLv: 5,
+    range: 200,
+    coolDown: 60,
+    duration: 0,
+    cost: 3000,
+    extra: 3,
+    extraPerLv: 1,
+  },
+  {
+    Rcode: TOW00004,
+    power: 10,
+    powerPerLv: 5,
+    range: 300,
+    coolDown: 120,
+    duration: 0,
+    cost: 3000,
+    extra: 10,
+    extraPerLv: 1,
+  },
+];
+
+export default towerData;
