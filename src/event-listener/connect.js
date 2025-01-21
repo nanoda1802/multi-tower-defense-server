@@ -1,6 +1,6 @@
-import onData from "./data.js";
-import onEnd from "./end.js";
-import onError from "./error.js";
+import onData from './data.js';
+import onEnd from './end.js';
+import onError from './error.js';
 
 /* connection 이벤트 리스너  */
 const onConnection = (socket) => {
