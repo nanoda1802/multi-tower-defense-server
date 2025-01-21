@@ -1,6 +1,6 @@
 export const packetNames = [
-  'Position', 
-  'BaseData', 
+  'Position',
+  'BaseData',
   'TowerData',
   'MonsterData',
   'InitialGameState',
@@ -26,5 +26,4 @@ export const packetNames = [
   'C2SGameEndRequest',
   'C2SMonsterDeathNotification',
   'S2CEnemyMonsterDeathNotification',
-]
-
+];
