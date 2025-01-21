@@ -662,20 +662,20 @@
       "2k8TuuCOzmo78f1U2-VZr": {
         "id": "2k8TuuCOzmo78f1U2-VZr",
         "tableId": "ThQ47OImkdHgIpkjxzqBy",
-        "name": "counterpart",
+        "name": "opponent_id",
         "comment": "상대방 아이디",
         "dataType": "string",
         "default": "",
         "options": 8,
         "ui": {
           "keys": 0,
-          "widthName": 64,
+          "widthName": 69,
           "widthComment": 77,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1737355658089,
+          "updateAt": 1737456617463,
           "createAt": 1737355406324
         }
       },
@@ -876,7 +876,7 @@
           "columnIds": [
             "jpPs6bof6tvp1P9XODhh6"
           ],
-          "x": 235.6078,
+          "x": 238.1078,
           "y": 428.4091,
           "direction": 4
         },
@@ -1205,7 +1205,7 @@
       1737355406323,
       -1,
       {
-        "name": 1737355429035,
+        "name": 1737456617462,
         "comment": 1737355433272,
         "options(notNull)": 1737355447451,
         "dataType": 1737355658089

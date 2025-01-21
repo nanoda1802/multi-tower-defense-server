@@ -1,7 +1,29 @@
+import User from './user.class.js';
+
 class UserSession {
   users = new Map();
 
-  // 메서드 추가
+  setUser(id, socket, winCount, loseCount, mmr) {
+    const newUser = new User(id, socket, winCount, loseCount, mmr);
+    this.users.set(socket, newUser);
+    return newUser;
+  }
+
+  getUser(socket) {
+    return this.users.get(socket);
+  }
+
+  removeUser(socket) {
+    this.users.delete(socket);
+  }
+
+  getAllUsers() {
+    return this.users; // 객체나 배열로 바꿔서 줘야하나? 쓸 일이 있을까 근데?
+  }
+
+  clearUserSession() {
+    this.users.clear();
+  }
 }
 
 export default UserSession;
