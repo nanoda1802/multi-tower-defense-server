@@ -1,6 +1,14 @@
+import env from "./env/env.js";
+import header from "./packet/header.js";
 import PacketType from "./packet/packet.type.js";
 
 const config = {
+  header: {
+    typeByte: header.TYPE_BYTE,
+    versionLengthByte: header.VERSION_LENGTH_BYTE,
+    sequenceByte: header.SEQUENCE_BYTE,
+    payloadLengthByte: header.PAYLOAD_LENGTH_BYTE,
+  },
   packetType: {
     registerRequest: PacketType.REGISTER_REQUEST,
     registerResponse: PacketType.REGISTER_RESPONSE,
@@ -22,6 +30,17 @@ const config = {
     gameEndRequest: PacketType.GAME_END_REQUEST,
     monsterDeathNotification: PacketType.MONSTER_DEATH_NOTIFICATION,
     enemyMonsterDeathNotification: PacketType.ENEMY_MONSTER_DEATH_NOTIFICATION,
+  },
+  env: {
+    port: env.PORT,
+    host: env.HOST,
+    clientVersion: env.CLIENT_VERSION,
+    db1Name: env.DB1_NAME,
+    db1User: env.DB1_USER,
+    db1Password: env.DB1_PASSWORD,
+    db1Host: env.DB1_HOST,
+    db1Port: env.DB1_PORT,
+    secretKey: env.SECRET_KEY,
   },
 };
 
