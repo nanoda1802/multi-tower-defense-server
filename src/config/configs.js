@@ -1,6 +1,6 @@
-import env from "./env/env.js";
-import header from "./packet/header.js";
-import PacketType from "./packet/packet.type.js";
+import env from './env/env.js';
+import header from './packet/header.js';
+import PacketType from './packet/packet.type.js';
 
 const config = {
   header: {
