@@ -5,6 +5,8 @@ class WaitingQueue {
   queue = new Set();
   isMatching = false;
 
+  mmrRange = 100; //이거 상수로 넣을꺼임
+
   // 유저 매칭 시작시 넣어줌
   addQueue(user) {
     if (!this.queue.has(user)) {
@@ -23,12 +25,29 @@ class WaitingQueue {
   // 매칭 시작
   startMatch() {
     if (this.queue.size < 2) {
+      this.isMatching = false;
       return;
     }
+    let isMatchFound = false;
+
     if (!this.isMatching) {
       this.isMatching = true;
     }
-    for (let user of this.queue) {
+
+    for (let targetUser of this.queue) {
+      if (isMatchFound) {
+        break;
+      }
+      for (let user of this.queue) {
+        if (targetUser === user) {
+          continue;
+        }
+        if (Math.abs(user.mmr - targetUser.mmr) <= mmrRange) {
+          this.onFoundMatch([targetUser, user]);
+          isMatchFound = true;
+          break;
+        }
+      }
     }
     setTimeout(startMatch, 1000);
   }
