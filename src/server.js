@@ -11,9 +11,6 @@ const startServer = async () => {
   await initServer();
   server.listen(config.env.port, config.env.host, () => {
     console.log(`서버 시작!!`);
-    console.log(makePath(5));
-    console.log(makePath(1));
-    console.log(makePath(4));
   });
 };
 
