@@ -28,38 +28,42 @@ export const onData = (socket) => async (data) => {
       ) {
         let versionOffset = packetTypeByte + versionLengthByte;
         const version = socket.buffer.slice(versionOffset, versionOffset + versionByte).toString();
-        const sequence = socket.buffer.readUInt32BE(packetTypeByte + versionLengthByte + versionByte);
+        const sequence = socket.buffer.readUInt32BE(
+          packetTypeByte + versionLengthByte + versionByte,
+        );
         const payloadLength = socket.buffer.readUInt32BE(
           packetTypeByte + versionLengthByte + versionByte + sequenceByte,
         );
-        const headerLength = packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte;
-        if(socket.buffer.length >= headerLength + payloadLength){
+        const headerLength =
+          packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte;
+        if (socket.buffer.length >= headerLength + payloadLength) {
           const packetType = socket.buffer.readUInt16BE(0);
           const payloadBuffer = socket.buffer.slice(headerLength, headerLength + payloadLength);
           socket.buffer = socket.buffer.slice(headerLength + payloadLength);
-  
-          console.log('------------- 헤더 -------------')
+
+          console.log('------------- 헤더 -------------');
           console.log('type:', packetType);
           console.log('versionLength:', versionByte);
           console.log('version:', version);
           console.log('sequence', sequence);
           console.log('payloadLength', payloadLength);
-          console.log('-------------------------------')
-  
+          console.log('-------------------------------');
+
           let proto = null;
 
-          switch(packetType){
-            case config.packetType.registerRequest: 
-              proto = getProtoMessages().C2SRegisterRequest; 
+          switch (packetType) {
+            case config.packetType.registerRequest:
+              proto = getProtoMessages().C2SRegisterRequest;
               // 핸들러
               break;
-            case config.packetType.loginRequest: 
-              proto = getProtoMessages().C2SLoginRequest; 
+            case config.packetType.loginRequest:
+              proto = getProtoMessages().C2SLoginRequest;
               break;
-            case config.packetType.matchRequest: 
-              proto = getProtoMessages().C2SMatchRequest; 
+            case config.packetType.matchRequest:
+              proto = getProtoMessages().C2SMatchRequest;
               break;
-            default : break;
+            default:
+              break;
           }
           const payload = proto.decode(payloadBuffer);
           console.log('페이로드:', payload);

@@ -72,13 +72,13 @@ function sendPacketBuffer(type, payload) {
   const sequence = 0;
   const payloadLength = payloadBuffer.length;
 
-  console.log('------------- 헤더 -------------')
+  console.log('------------- 헤더 -------------');
   console.log('type:', type);
   console.log('versionLength:', versionLength);
   console.log('version:', version);
   console.log('sequence', sequence);
   console.log('payloadLength', payloadLength);
-  console.log('-------------------------------')
+  console.log('-------------------------------');
 
   // 헤더 필드 - 패킷 타입
   const packetTypeBuffer = Buffer.alloc(2);
