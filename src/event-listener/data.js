@@ -29,7 +29,6 @@ export const onData = (socket) => async (data) => {
       ) {
         let versionOffset = packetTypeByte + versionLengthByte;
         const version = socket.buffer.slice(versionOffset, versionOffset + versionByte).toString();
-<<<<<<< HEAD
         
         // 버전 검증
         verifyClientVersion(version);
@@ -44,16 +43,6 @@ export const onData = (socket) => async (data) => {
           packetTypeByte + versionLengthByte + versionByte + sequenceByte,
         );
 
-=======
-        const sequence = socket.buffer.readUInt32BE(
-          packetTypeByte + versionLengthByte + versionByte,
-        );
-        const payloadLength = socket.buffer.readUInt32BE(
-          packetTypeByte + versionLengthByte + versionByte + sequenceByte,
-        );
-        const headerLength =
-          packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte;
->>>>>>> dev
         if (socket.buffer.length >= headerLength + payloadLength) {
           const packetType = socket.buffer.readUInt16BE(0);
           const payloadBuffer = socket.buffer.slice(headerLength, headerLength + payloadLength);
@@ -66,7 +55,6 @@ export const onData = (socket) => async (data) => {
           console.log('sequence', sequence);
           console.log('payloadLength', payloadLength);
           console.log('-------------------------------');
-<<<<<<< HEAD
 
           // C2S 패킷타입별 핸들러 실행
           let proto = null;
@@ -127,23 +115,6 @@ export const onData = (socket) => async (data) => {
               break;
             default:
               console.log('패킷 타입 : ', packetType);
-=======
-
-          let proto = null;
-
-          switch (packetType) {
-            case config.packetType.registerRequest:
-              proto = getProtoMessages().C2SRegisterRequest;
-              // 핸들러
-              break;
-            case config.packetType.loginRequest:
-              proto = getProtoMessages().C2SLoginRequest;
-              break;
-            case config.packetType.matchRequest:
-              proto = getProtoMessages().C2SMatchRequest;
-              break;
-            default:
->>>>>>> dev
               break;
           }
         }
