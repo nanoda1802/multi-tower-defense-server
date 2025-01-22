@@ -15,9 +15,10 @@ class Room {
     setPlayers(users);
   }
 
+  // 플레이어 관련
   setPlayers(users) {
     for (let user of users) {
-      this.players.set(user.socket, new Player(user.socket, this.id));
+      this.players.set(user.socket, new Player(user.id, user.socket, this.id, user.sequn));
     }
   }
 
@@ -35,6 +36,19 @@ class Room {
       monsterSpawnInterval: this.monsterSpawnInterval,
     };
   }
+
+  // 몬스터
+  setMonster() {}
+
+  getMonster() {}
+
+  deleteMonster() {}
+  // 타워
+  setTower() {}
+
+  getTower() {}
+
+  deleteTower() {}
 }
 
 export default Room;
