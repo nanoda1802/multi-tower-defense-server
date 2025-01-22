@@ -9,6 +9,8 @@ class Room {
     this.initialGold = 10;
     this.monsterSpawnInterval = 1;
 
+    this.monsters = new Map();
+    this.towers = new Map();
     this.players = new Map();
     setPlayers(users);
   }
@@ -24,6 +26,7 @@ class Room {
       return this.players[socket];
     }
   }
+
   getInitData() {
     return {
       baseHp: this.baseHp,
