@@ -1,3 +1,4 @@
+import finishMatchHandler from '../../handlers/match/finish.match.handler';
 import Player from '../in-game/player.class';
 
 class Room {
@@ -9,6 +10,9 @@ class Room {
     this.initialGold = 10;
     this.monsterSpawnInterval = 1;
 
+    this.monsterId = 0;
+    this.towerId = 0;
+
     this.monsters = new Map();
     this.towers = new Map();
     this.players = new Map();
@@ -18,8 +22,10 @@ class Room {
   // 플레이어 관련
   setPlayers(users) {
     for (let user of users) {
+      user.enterRoom(this.id);
       this.players.set(user.socket, new Player(user.id, user.socket, this.id, user.sequn));
     }
+    finishMatchHandler(this, users);
   }
 
   getPlayer(socket) {
@@ -38,17 +44,42 @@ class Room {
   }
 
   // 몬스터
-  setMonster() {}
+  setMonster(monsterId, Rcode, userId) {
+    const monster = new Monster(monsterId, this.monsterId, roomLevel, Rcode, userId);
+    this.monsters.set(this.monsterId, monster);
+    this.monsterId++;
+  }
 
-  getMonster() {}
+  getMonster(monsterId) {
+    if (this.monsters[monsterId] !== undefined) {
+      return this.monsters[monsterId];
+    }
+  }
 
-  deleteMonster() {}
+  deleteMonster(monsterId) {
+    if (this.monsters[monsterId] !== undefined) {
+      this.monsters.delete(monsterId);
+    }
+  }
+
   // 타워
-  setTower() {}
+  setTower(x, y, Rcode, userId) {
+    const tower = new Tower(this.towerId, x, y, Rcode, userId);
+    this.towers.set(this.towerId, tower);
+    this.towerId++;
+  }
 
-  getTower() {}
+  getTower(towerId) {
+    if (this.towers[towerId] !== undefined) {
+      return this.towers[towerId];
+    }
+  }
 
-  deleteTower() {}
+  deleteTower(towerId) {
+    if (this.towers[towerId] !== undefined) {
+      this.towers.delete(towerId);
+    }
+  }
 }
 
 export default Room;
