@@ -1,4 +1,4 @@
-import { roomSession, userSession } from '../../session/session';
+import { roomSession, userSession } from '../../session/session.js';
 
 const attackBaseHandler = (socket, payload) => {
   // 세션<>입력 검증 과정
@@ -9,7 +9,7 @@ const attackBaseHandler = (socket, payload) => {
   const player = room.getPlayer(user.id);
   if (!player) return;
   // base 피격 적용
-  player.base.damaged(room, payload.damage);
+  player.base.damaged(room, user.id, payload.damage);
 };
 
 export default attackBaseHandler;
