@@ -1,7 +1,9 @@
 import RoomSession from '../class/room/room.session.class.js';
 import UserSession from '../class/user/user.session.class.js';
+import WaitingQueue from '../utils/queue/waiting.queue.class.js';
 
 const userSession = new UserSession();
 const roomSession = new RoomSession();
+const waitingQueue = new WaitingQueue();
 
-export { userSession, roomSession };
+export { userSession, roomSession, waitingQueue };
