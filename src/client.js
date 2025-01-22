@@ -26,6 +26,8 @@ client.connect(PORT, HOST, async () => {
   await loadProtos();
   //console.log(Object.keys(getProtoMessages()));
 
+  client.buffer = Buffer.alloc(0);
+
   try {
     const registerRequestPayload = { id: 'test_id', password: '1234', email: 'test@gmail.com' };
     const loginRequestPayload = { id: 'test_id', password: 'test_1234' };
@@ -33,9 +35,9 @@ client.connect(PORT, HOST, async () => {
 
     sendPacketBuffer(config.packetType.registerRequest, registerRequestPayload);
 
-    console.log('C2S 매칭요청 패킷 전송 완료');
+    console.log('C2S 패킷 전송 완료');
   } catch (error) {
-    console.log('C2S 매칭요청 패킷 전송 실패');
+    console.log('C2S 패킷 전송 실패');
     console.error(error);
   }
 });
@@ -115,39 +117,78 @@ function sendPacketBuffer(type, payload) {
 }
 
 client.on('data', (data) => {
-  // const totalLength = data.readUInt32BE(0);
-  // const packetType = data.readUInt8(4);
-  // const payloadBuffer = data.slice(5, totalLength + 5);
-  // switch (packetType) {
-  //   case PACKET_TYPE.INIT:
-  //     const initProto = getProtoMessages().response.Init;
-  //     const responseInitPayload = initProto.decode(payloadBuffer);
-  //     console.log('Init 패킷 응답받음');
-  //     console.log('userId:', responseInitPayload.userId);
-  //     console.log('message:', responseInitPayload.message);
-  //     break;
-  //   case PACKET_TYPE.LOCATION:
-  //     const locationProto = getProtoMessages().response.LocationUpdate;
-  //     const responseLocationPayload = locationProto.decode(payloadBuffer);
-  //     console.log('Location 패킷 응답받음');
-  //     console.log('x:', responseLocationPayload.x, 'y:', responseLocationPayload.y);
-  //     console.log('message:', responseLocationPayload.message);
-  //     break;
-  // }
+  try {
+    client.buffer = Buffer.concat([client.buffer, data]);
+
+    const packetTypeByte = config.header.typeByte;
+    const versionLengthByte = config.header.versionLengthByte;
+    let versionByte = null;
+    const sequenceByte = config.header.sequenceByte;
+    const payloadLengthByte = config.header.payloadLengthByte;
+
+    while (client.buffer.length >= packetTypeByte + versionLengthByte) {
+      versionByte = client.buffer.readUInt8(packetTypeByte);
+      while (
+        client.buffer.length >=
+        packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte
+      ) {
+        let versionOffset = packetTypeByte + versionLengthByte;
+        const version = client.buffer.slice(versionOffset, versionOffset + versionByte).toString();
+
+        // 버전 검증
+        //verifyClientVersion(version);
+
+        const sequence = client.buffer.readUInt32BE(
+          packetTypeByte + versionLengthByte + versionByte,
+        );
+
+        const headerLength =
+          packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte;
+        const payloadLength = client.buffer.readUInt32BE(
+          packetTypeByte + versionLengthByte + versionByte + sequenceByte,
+        );
+
+        if (client.buffer.length >= headerLength + payloadLength) {
+          const packetType = client.buffer.readUInt16BE(0);
+          const payloadBuffer = client.buffer.slice(headerLength, headerLength + payloadLength);
+          client.buffer = client.buffer.slice(headerLength + payloadLength);
+
+          console.log('------------- 헤더 -------------');
+          console.log('type:', packetType);
+          console.log('versionLength:', versionByte);
+          console.log('version:', version);
+          console.log('sequence', sequence);
+          console.log('payloadLength', payloadLength);
+          console.log('-------------------------------');
+
+          // S2C 패킷타입별 핸들러 실행
+          let proto = null;
+          let payload = null;
+          switch (packetType) {
+            case config.packetType.registerResponse:
+              proto = getProtoMessages().S2CRegisterResponse;
+              payload = proto.decode(payloadBuffer);
+              // handler(client, payload)
+              console.log('서버로부터 응답', payload);
+              break;
+            case config.packetType.loginRequest:
+              proto = getProtoMessages().S2CLoginResponse;
+              payload = proto.decode(payloadBuffer);
+              // handler(client, payload)
+              console.log('서버로부터 응답', payload);
+              break;
+            default:
+              console.log('패킷 타입 : ', packetType);
+              break;
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.log('패킷 수신 오류');
+    console.error(error);
+  }
 });
-
-// 페이로드 구성 함수 prameter -> payload(object)
-function createRegisterRequestPayload(id, password, email) {
-  return { id, password, email };
-}
-
-function createLoginRequestPayload(id, password) {
-  return { deviceId };
-}
-
-function createMatchRequestPayload() {
-  return {};
-}
 
 function delay(ms) {
   new Promise((res) => setTimeout(res, ms));

@@ -22,6 +22,7 @@ const config = {
     registerRequest: PacketType.REGISTER_REQUEST,
     registerResponse: PacketType.REGISTER_RESPONSE,
     loginRequest: PacketType.LOGIN_REQUEST,
+    loginResponse: PacketType.LOGIN_RESPONSE,
     matchRequest: PacketType.MATCH_REQUEST,
     matchStartNotification: PacketType.MATCH_START_NOTIFICATION,
     stateSyncNotification: PacketType.STATE_SYNC_NOTIFICATION,
