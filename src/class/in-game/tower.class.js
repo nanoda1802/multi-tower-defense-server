@@ -14,24 +14,28 @@ class Tower {
     const timeDiff = Date.now() - this.lastUpdate;
 
     // 위치 정보 확인
-    if (this.x + this.stat.range/2 > targetX || this.x - this.stat.range/2 < targetX || this.y + this.stat.range/2 > targetY || this.y - this.stat.range/2 < targetY)
-      return false
+    if (
+      this.x + this.stat.range / 2 > targetX ||
+      this.x - this.stat.range / 2 < targetX ||
+      this.y + this.stat.range / 2 > targetY ||
+      this.y - this.stat.range / 2 < targetY
+    )
+      return false;
 
-    // 공격 쿨타임 확인 
-    if (timeDiff < this.stat.coolDown) return false
+    // 공격 쿨타임 확인
+    if (timeDiff < this.stat.coolDown) return false;
 
     this.lastUpdate = Date.now();
     return true;
   }
 
   levelUp() {
-    this.level++
+    this.level++;
   }
 
   getDamage() {
-    return this.stat.power + this.level * this.stat.powerPerLv
+    return this.stat.power + this.level * this.stat.powerPerLv;
   }
-
 }
 
 export default Tower;
