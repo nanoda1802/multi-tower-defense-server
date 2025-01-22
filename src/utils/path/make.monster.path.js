@@ -6,10 +6,10 @@ const makePath = (count) => {
       [0, 350],
       [1500, 350],
     ];
-  const weightX = Math.trunc(1500 / count);
+  const weightX = Math.trunc(1500 / (count-1));
 
   for (let i = 0; i < count; i++) {
-    let x = weightX * (i + 1);
+    let x = weightX * i;
     if (i === count - 1) x = 1500;
     const y = Math.trunc(Math.random() * 200) + 200;
     paths.push([x, y]);
