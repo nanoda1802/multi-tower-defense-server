@@ -8,7 +8,7 @@ const attackBaseHandler = (socket, payload) => {
   if (!room) return;
   const player = room.getPlayer(user.id);
   if (!player) return;
-
+  // base 피격 적용
   player.base.damaged(room, payload.damage);
 };
 
