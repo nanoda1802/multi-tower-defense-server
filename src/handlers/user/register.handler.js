@@ -1,5 +1,7 @@
 import bcrypt from 'bcrypt';
 import config from '../../config/configs.js';
+import makePacketBuffer from '../../utils/send-packet/makePacket.js';
+import { GlobalFailCode } from '../../utils/send-packet/payload/game.data.js';
 // 요청 페이로드 C2SRegisterRequest {id,password,email}
 // 응답 페이로드 S2CRegisterResponse {success,message,failCode}
 
@@ -16,7 +18,7 @@ const makeFailPayload = (input) => {
   return {
     success: false,
     message,
-    failCode: config.failCode.invalidRequest,
+    failCode: GlobalFailCode.INVALID_REQUEST,
   };
 };
 
@@ -42,16 +44,16 @@ const validateRegisterInfo = async (id, password, email) => {
     // 추가 에러 처리도 ㄱㄱ
   }
   // [6] 전부 통과하면 성공 응답 페이로드 반환
-  return { success: true, message: `회원가입 성공이여유!`, failCode: config.failCode.none };
+  return { success: true, message: `회원가입 성공이여유!`, failCode: GlobalFailCode.NONE };
 };
 
-const registerHandler = (socket, payload) => {
+const registerHandler = async (socket, payload) => {
   // [1] 페이로드에서 정보 추출
   const { id, password, email } = payload;
   // [2] 상황별 응답 페이로드 준비
-  const responsePayload = validateRegisterInfo(id, password, email);
-  // [3] 패킷 만들고 버퍼로 변환 (패킷 생성 함수 확정되면 수정)
-  const S2CRegisterResponse = sendPacketBuffer(config.packetType.registerResponse, responsePayload);
+  const responsePayload = await validateRegisterInfo(id, password, email);
+  // [3] 패킷 만들고 버퍼로 변환
+  const S2CRegisterResponse = makePacketBuffer(config.packetType.registerResponse, responsePayload);
   // [4] 만든 버퍼 클라이언트에 송신
   socket.write(S2CRegisterResponse);
 };

@@ -1,7 +1,11 @@
 import config from '../config/configs.js';
 import { getProtoMessages } from '../init/load.proto.js';
-import { makeLoginResponse, makeRegisterResponse } from '../utils/send-packet/payload/response/game.response.js';
+import {
+  makeLoginResponse,
+  makeRegisterResponse,
+} from '../utils/send-packet/payload/response/game.response.js';
 import makePacketBuffer from '../utils/send-packet/makePacket.js';
+import registerHandler from '../handlers/user/register.handler.js';
 
 export const onData = (socket) => async (data) => {
   // // | **필드 명** | **타입** | **설명** |
@@ -29,7 +33,7 @@ export const onData = (socket) => async (data) => {
       ) {
         let versionOffset = packetTypeByte + versionLengthByte;
         const version = socket.buffer.slice(versionOffset, versionOffset + versionByte).toString();
-        
+
         // 버전 검증
         verifyClientVersion(version);
 
@@ -65,10 +69,10 @@ export const onData = (socket) => async (data) => {
             case config.packetType.registerRequest:
               proto = getProtoMessages().C2SRegisterRequest;
               payload = proto.decode(payloadBuffer);
-              // handler(socket, payload)
-              response = makeRegisterResponse(true, '가입요청 응답', 0);
-              responsePacket = makePacketBuffer(config.packetType.registerResponse, response);
-              socket.write(responsePacket);
+              registerHandler(socket, payload);
+              // response = makeRegisterResponse(true, '가입요청 응답', 0);
+              // responsePacket = makePacketBuffer(config.packetType.registerResponse, response);
+              // socket.write(responsePacket);
               break;
             case config.packetType.loginRequest:
               proto = getProtoMessages().C2SLoginRequest;

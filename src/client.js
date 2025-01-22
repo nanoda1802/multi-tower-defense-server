@@ -17,7 +17,7 @@ const sequenceByte = 4;
 const payloadLengthByte = 4;
 
 const HOST = '127.0.0.1';
-const PORT = 5551;
+const PORT = 5555;
 
 const client = new net.Socket();
 
