@@ -2,6 +2,7 @@ import net from 'net';
 import onConnection from './event-listener/connect.js';
 import initServer from './init/init.server.js';
 import config from './config/configs.js';
+import makePath from './utils/path/make.monster.path.js';
 
 /* 서버 생성 */
 const server = net.createServer(onConnection);
