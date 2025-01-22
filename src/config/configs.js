@@ -1,4 +1,4 @@
-import { INITIAL_GOLD } from './constants/game.js';
+import { INITIAL_GOLD, TOWER_COST } from './constants/game.js';
 import userState from './constants/user.js';
 import env from './env/env.js';
 import header from './packet/header.js';
@@ -46,6 +46,7 @@ const config = {
   },
   game: {
     initialGold: INITIAL_GOLD,
+    towerCost: TOWER_COST,
   },
   userState: {
     waiting: userState.WAITING,
