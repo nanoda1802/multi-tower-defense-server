@@ -1,6 +1,8 @@
-import env from "./env/env.js";
-import header from "./packet/header.js";
-import PacketType from "./packet/packet.type.js";
+import { INITIAL_GOLD, TOWER_COST } from './constants/game.js';
+import userState from './constants/user.js';
+import env from './env/env.js';
+import header from './packet/header.js';
+import PacketType from './packet/packet.type.js';
 
 const config = {
   header: {
@@ -41,6 +43,15 @@ const config = {
     db1Host: env.DB1_HOST,
     db1Port: env.DB1_PORT,
     secretKey: env.SECRET_KEY,
+  },
+  game: {
+    initialGold: INITIAL_GOLD,
+    towerCost: TOWER_COST,
+  },
+  userState: {
+    waiting: userState.WAITING,
+    matchMaking: userState.MATCH_MAKING,
+    gamePlaying: userState.GAME_PLAYING,
   },
 };
 
