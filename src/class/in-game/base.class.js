@@ -11,7 +11,7 @@ class Base {
       // 게임종료 알림 패킷 생성
 
       // room 내의 플레이어들에게 전달
-      room.players.forEach((player) => player.socket.write())
+      room.players.forEach((player) => player.socket.write());
     }
   }
 

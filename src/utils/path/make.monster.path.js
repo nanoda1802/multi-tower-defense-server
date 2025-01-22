@@ -6,7 +6,7 @@ const makePath = (count) => {
       [0, 350],
       [1500, 350],
     ];
-  const weightX = Math.trunc(1500 / (count-1));
+  const weightX = Math.trunc(1500 / (count - 1));
 
   for (let i = 0; i < count; i++) {
     let x = weightX * i;
