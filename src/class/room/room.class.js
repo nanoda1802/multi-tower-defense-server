@@ -1,5 +1,5 @@
-import finishMatchHandler from '../../handlers/match/finish.match.handler';
-import Player from '../in-game/player.class';
+import finishMatchHandler from '../../handlers/match/finish.match.handler.js';
+import Player from '../in-game/player.class.js';
 
 class Room {
   constructor(id, users) {
