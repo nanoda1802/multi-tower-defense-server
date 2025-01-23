@@ -11,8 +11,38 @@ function makePacketBuffer(packetType, payload) {
     case config.packetType.loginResponse:
       proto = getProtoMessages().S2CLoginResponse;
       break;
-    case config.packetType.matchRequest:
-      proto = getProtoMessages().C2SMatchRequest;
+    case config.packetType.matchStartNotification:
+      proto = getProtoMessages().S2CMatchStartNotification;
+      break;
+    case config.packetType.stateSyncNotification:
+      proto = getProtoMessages().S2CStateSyncNotification;
+      break;
+    case config.packetType.towerPurchaseResponse:
+      proto = getProtoMessages().S2CTowerPurchaseResponse;
+      break;
+    case config.packetType.addEnemyTowerNotification:
+      proto = getProtoMessages().S2CAddEnemyTowerNotification;
+      break;
+    case config.packetType.spawnMonsterResponse:
+      proto = getProtoMessages().S2CSpawnMonsterResponse;
+      break;
+    case config.packetType.spawnEnemyMonsterNotification:
+      proto = getProtoMessages().S2CSpawnEnemyMonsterNotification;
+      break;
+    case config.packetType.enemyTowerAttackNotification:
+      proto = getProtoMessages().S2CEnemyTowerAttackNotification;
+      break;
+    case config.packetType.updateBaseHpNotification:
+      proto = getProtoMessages().S2CUpdateBaseHPNotification;
+      break;
+    case config.packetType.gameOverNotification:
+      proto = getProtoMessages().S2CGameOverNotification;
+      break;
+    case config.packetType.monsterDeathNotification:
+      proto = getProtoMessages().C2SMonsterDeathNotification;
+      break;
+    case config.packetType.enemyMonsterDeathNotification:
+      proto = getProtoMessages().S2CEnemyMonsterDeathNotification;
       break;
     default: {
       console.log('타입에 해당하는 프로토메시지를 찾을 수 없음');
