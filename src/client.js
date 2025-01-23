@@ -123,7 +123,7 @@ function sendPacketBuffer(type, sequence, payload) {
   client.write(packetBuffer);
 }
 
-function addSequence(){
+function addSequence() {
   sequence++;
 }
 
@@ -146,15 +146,17 @@ client.on('data', (data) => {
         // 버전 검증
         let versionOffset = packetTypeByte + versionLengthByte;
         const version = client.buffer.slice(versionOffset, versionOffset + versionByte).toString();
-        if(!version===config.env.clientVersion) return;
+        if (!version === config.env.clientVersion) return;
 
         // 시퀀스 검증
         const expectedSequence = sequence;
         const receivedSequence = client.buffer.readUInt32BE(
           packetTypeByte + versionLengthByte + versionByte,
         );
-        if(expectedSequence!==receivedSequence){
-          console.log(`시퀀스 오류. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${receivedSequence}`);
+        if (expectedSequence !== receivedSequence) {
+          console.log(
+            `시퀀스 오류. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${receivedSequence}`,
+          );
           return;
         }
 
@@ -192,6 +194,12 @@ client.on('data', (data) => {
               payload = proto.decode(payloadBuffer);
               // handler(client, payload)
               console.log('서버로부터 응답', payload);
+              break;
+            case config.packetType.matchStartNotification:
+              proto = getProtoMessages().S2CMatchStartNotification;
+              payload = proto.decode(payloadBuffer);
+              // handler(client, payload)
+              console.log('서버로부터 응답', JSON.stringify(payload, null, 2));
               break;
             default:
               console.log('핸들러가 등록되지 않은 패킷 타입 : ', packetType);
