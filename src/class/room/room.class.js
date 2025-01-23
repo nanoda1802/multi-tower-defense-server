@@ -10,6 +10,8 @@ class Room {
     this.initialGold = 10;
     this.monsterSpawnInterval = 1;
 
+    // 변수들 입니다.
+    this.roomLevel = 0;
     this.monsterId = 0;
     this.towerId = 0;
 
@@ -25,7 +27,7 @@ class Room {
       user.enterRoom(this.id);
       this.players.set(user.socket, new Player(user.id, user.socket, this.id, user.sequn));
     }
-    finishMatchHandler(this, users);
+    finishMatchHandler(this);
   }
 
   getPlayer(socket) {
@@ -45,7 +47,7 @@ class Room {
 
   // 몬스터
   setMonster(monsterId, Rcode, userId) {
-    const monster = new Monster(monsterId, this.monsterId, roomLevel, Rcode, userId);
+    const monster = new Monster(monsterId, this.monsterId, this.roomLevel, Rcode, userId);
     this.monsters.set(this.monsterId, monster);
     this.monsterId++;
   }
