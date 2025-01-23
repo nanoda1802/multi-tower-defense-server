@@ -1,6 +1,9 @@
 import config from '../config/configs.js';
 import { getProtoMessages } from '../init/load.proto.js';
-import { makeLoginResponse, makeRegisterResponse } from '../utils/send-packet/payload/response/game.response.js';
+import {
+  makeLoginResponse,
+  makeRegisterResponse,
+} from '../utils/send-packet/payload/response/game.response.js';
 import makePacketBuffer from '../utils/send-packet/makePacket.js';
 
 export const onData = (socket) => async (data) => {
@@ -29,7 +32,7 @@ export const onData = (socket) => async (data) => {
       ) {
         let versionOffset = packetTypeByte + versionLengthByte;
         const version = socket.buffer.slice(versionOffset, versionOffset + versionByte).toString();
-        
+
         // 버전 검증
         verifyClientVersion(version);
 

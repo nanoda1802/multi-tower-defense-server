@@ -1,11 +1,11 @@
 import monsterData from '../../assets/monster.js';
 
 class Monster {
-  constructor(monsterId, monsterNumber, level, Rcode, playerId) {
+  constructor(monsterId, monsterNumber, level, playerId) {
     this.monsterId = monsterId;
     this.monsterNumber = monsterNumber;
     this.level = level;
-    this.stat = monsterData.find((element) => element.Rcode === Rcode);
+    this.stat = monsterData.find((element) => element.Rcode === 'MON0000' + monsterId);
     this.playerId = playerId;
     this.state = 'alive'; // 'alive' 'dead' 로 표기
     this.spawnAt = Date.now();
