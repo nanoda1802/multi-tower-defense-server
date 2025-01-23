@@ -50,8 +50,14 @@ export const onData = (socket) => async (data) => {
           packetTypeByte + versionLengthByte + versionByte,
         );
 
-        if (sequence === userSession.getUser(socket).getSequence()) console.log('시퀀스 검증 통과');
-        else console.log('시퀀스 오류');
+        let expectedSequence = userSession.getUser(socket).getSequence();
+        if (sequence === expectedSequence) {
+          console.log('시퀀스 검증 통과');
+          // user.sequence++;
+        }else {
+          console.log(`시퀀스 에러. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${sequence}`);
+          return; // 기대 시퀀스가 올 때까지 패킷 무시
+        }
 
         const headerLength =
           packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte;
@@ -176,7 +182,7 @@ export const onData = (socket) => async (data) => {
               // handler(socket, payload)
               break;
             default:
-              console.log('패킷 타입 : ', packetType);
+              console.log('정의되지 않은 패킷 타입 : ', packetType);
               break;
           }
         }
