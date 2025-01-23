@@ -21,7 +21,7 @@ const purchaseTowerHandler = (socket, payload) => {
     room.players.forEach((player) => {
         let packet
         // player가 자신일 경우 response, 상대방일 경우 notification 반환
-        if (player.playerId === user.id)
+        if (player.id === user.id)
             packet = makePacketBuffer(config.packetType.towerPurchaseResponse, { towerId })
         else
             packet = makePacketBuffer(config.packetType.addEnemyTowerNotification, { towerId, x, y })

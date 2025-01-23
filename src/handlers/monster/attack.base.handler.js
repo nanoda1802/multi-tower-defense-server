@@ -21,7 +21,7 @@ const attackBaseHandler = (socket, payload) => {
     room.players.forEach((player) => {
       let packet
       // player가 자신일 경우 패배, 상대방일 경우 승리 정보를 반환
-      if (player.playerId === user.id)
+      if (player.id === user.id)
         packet = makePacketBuffer(config.packetType.gameOverNotification, { isWin: false })
       else
         packet = makePacketBuffer(config.packetType.gameOverNotification, { isWin: true })
@@ -33,7 +33,7 @@ const attackBaseHandler = (socket, payload) => {
     room.players.forEach((player) => {
       // player가 누구인지에 따라 isOpponent 조정
       let isOpponent
-      if (player.playerId === user.id) isOpponent = false
+      if (player.id === user.id) isOpponent = false
       else isOpponent = true
       // 패킷 생성 후 전달
       const packet = makePacketBuffer(config.packetType.updateBaseHpNotification, { isOpponent, baseHp })
