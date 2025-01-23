@@ -8,7 +8,7 @@ const { game } = config;
 
 class Player {
   /* 베이스, 몬스터, 타워에 필요한 매개변수 말씀해주시면 추가하기 */
-  constructor(userId, socket, highScore, roomId, sequence) {
+  constructor(userId, socket, roomId) {
     this.id = userId;
     this.socket = socket; // 아니면 User 인스턴스를 통째로....? sequence 때문에 고민
     this.roomId = roomId;
@@ -19,7 +19,6 @@ class Player {
     this.base = new Base();
     this.towers = new Map(); // 여기는 뭐로 식별할지 고민해봐야함
     this.monsters = new Map(); // 아마 key에 클라에서 보내주는 monsterNumber를?
-    this.sequence = sequence; // 유저한테서 넘겨 받아서 쓰다가 매치 종료되면 유저에 돌려줌
   }
 
   getScore(point) {
@@ -29,10 +28,18 @@ class Player {
   matchOpponent() {} // 룸에서 해주시려나? 일단!
 
   /* 베이스, 몬스터, 타워에 필요한 매개변수 말씀해주시면 추가하기 */
-  placeTower(towerId) {
-    this.gold -= game.towerCost;
-    this.towers.set(towerId, new Tower()); // 타워 식별자 필요
+  placeTower(room, x,y) {
+    // 골드가 충분한지 확인
+    if (this.gold < game.towerCost) return -1
+    else {
+      const towerId = room.getTowerId();
+      this.gold -= game.towerCost;
+      // 현재 클라이언트에서 생성되는 타워는 TOW00001이 유일하기에 고정
+      this.towers.set(towerId, new Tower(towerId, x, y,"TOW00001",this.id));
+      return towerId
+    }
   }
+  
   removeTower(towerId) {
     this.towers.delete(towerId); // 타워 식별자 필요
   }
@@ -43,9 +50,9 @@ class Player {
     this.monsters.delete(monsterId);
     // 골드 얻고?
   }
-  increaseSequence() {
-    return ++this.sequence;
-  }
+
+
+
 }
 
 export default Player;
