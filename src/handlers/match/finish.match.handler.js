@@ -35,7 +35,7 @@ const finishMatchHandler = (room) => {
     );
     let opponentData = {};
     for (let player of room.players.values) {
-      if (targetPlayer.userId === player.userId) {
+      if (targetPlayer.id === player.id) {
         continue;
       }
       // 다른 사람 데이터
