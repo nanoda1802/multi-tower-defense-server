@@ -6,7 +6,7 @@ import { GlobalFailCode } from '../../utils/send-packet/payload/game.data.js';
 // 응답 페이로드 S2CRegisterResponse {success,message,failCode}
 
 const regex = {
-  id: /^[a-z0-9]+$/, // 아이디는 빈칸이 아니고, 영어와 숫자로만
+  id: /^[a-z0-9]+$/, // 아이디는 빈칸이 아니고, 영소문자 또는 숫자로만
   pw: /^[a-z0-9]{4,}$/, // 비밀번호는 최소 네자리, 영소문자 또는 숫자로만
   email: /^[a-z0-9]+@[a-z]+\.[a-z]{2,}$/, // 이메일은 일반적인 이메일 형식
 };
@@ -50,7 +50,7 @@ const validateRegisterInfo = async (id, password, email) => {
 const registerHandler = async (socket, payload) => {
   // [1] 페이로드에서 정보 추출
   const { id, password, email } = payload;
-  // [2] 상황별 응답 페이로드 준비
+  // [2] 가입 정보 검증 후 응답 페이로드 준비
   const responsePayload = await validateRegisterInfo(id, password, email);
   // [3] 패킷 만들고 버퍼로 변환
   const S2CRegisterResponse = makePacketBuffer(config.packetType.registerResponse, responsePayload);
