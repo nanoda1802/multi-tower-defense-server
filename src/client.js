@@ -21,6 +21,8 @@ const PORT = 5551;
 
 const client = new net.Socket();
 
+let sequence = 1;
+
 client.connect(PORT, HOST, async () => {
   console.log('Connectied to server');
   await loadProtos();
@@ -33,7 +35,9 @@ client.connect(PORT, HOST, async () => {
     const loginRequestPayload = { id: 'test_id', password: 'test_1234' };
     const matchRequestPayload = {};
 
-    sendPacketBuffer(config.packetType.registerRequest, registerRequestPayload);
+    //sendPacketBuffer(config.packetType.registerRequest, sequence, registerRequestPayload);
+    sendPacketBuffer(config.packetType.matchRequest, sequence, matchRequestPayload);
+    sequence++;
 
     console.log('C2S 패킷 전송 완료');
   } catch (error) {
@@ -43,7 +47,7 @@ client.connect(PORT, HOST, async () => {
 });
 
 // 버퍼로 변환 및 송신
-function sendPacketBuffer(type, payload) {
+function sendPacketBuffer(type, sequence, payload) {
   let proto;
   switch (type) {
     case config.packetType.registerRequest:
@@ -71,7 +75,6 @@ function sendPacketBuffer(type, payload) {
   // 헤더 필드값
   const version = config.env.clientVersion || '1.0.0';
   const versionLength = version.length;
-  const sequence = 0;
   const payloadLength = payloadBuffer.length;
 
   console.log('------------- 헤더 -------------');
