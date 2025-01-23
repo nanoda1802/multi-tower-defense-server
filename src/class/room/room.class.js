@@ -4,11 +4,6 @@ import Player from '../in-game/player.class';
 class Room {
   constructor(id, users) {
     this.id = id;
-    // 상수들 입니다
-    this.baseHp = 10;
-    this.towerCost = 10;
-    this.initialGold = 10;
-    this.monsterSpawnInterval = 1;
 
     // 변수들 입니다.
     this.roomLevel = 0;
