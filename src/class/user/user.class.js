@@ -4,17 +4,29 @@ const { userState } = config;
 
 class User {
   // 여기도 roomId 있어야하려나....?
-  constructor(id, socket, winCount, loseCount, mmr) {
-    this.id = id;
+  constructor(socket) {
+    this.key = null;
+    this.id = null;
     this.roomId = null;
     this.socket = socket;
     this.state = userState.waiting; // "waiting", "matchMaking", "playing"
+
+    this.highScore = null;
     this.matchRecord = {
-      win: winCount,
-      lose: loseCount,
+      win: null,
+      lose: null,
     };
-    this.mmr = mmr;
+    this.mmr = null;
     this.sequence = 1; // 클라에서 헤더로 주자나?
+  }
+
+  login(key, userId, highScore, winCount, loseCount, mmr) {
+    this.key = key;
+    this.id = userId;
+    this.highScore = highScore;
+    this.matchRecord.win = winCount;
+    this.matchRecord.lose = loseCount;
+    this.mmr = mmr;
   }
 
   enterRoom(roomId) {

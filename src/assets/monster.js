@@ -1,6 +1,6 @@
 const monsterData = [
   {
-    Rcode: MON00001,
+    Rcode: 'MON00001',
     maxHp: 100,
     hpPerLv: 10,
     spd: 150,
@@ -10,7 +10,7 @@ const monsterData = [
     atkPerLv: 2,
   },
   {
-    Rcode: MON00002,
+    Rcode: 'MON00002',
     maxHp: 100,
     hpPerLv: 15,
     spd: 150,
@@ -20,7 +20,7 @@ const monsterData = [
     atkPerLv: 1,
   },
   {
-    Rcode: MON00003,
+    Rcode: 'MON00003',
     maxHp: 100,
     hpPerLv: 10,
     spd: 150,
@@ -30,7 +30,7 @@ const monsterData = [
     atkPerLv: 2,
   },
   {
-    Rcode: MON00004,
+    Rcode: 'MON00004',
     maxHp: 100,
     hpPerLv: 20,
     spd: 150,
@@ -40,7 +40,7 @@ const monsterData = [
     atkPerLv: 3,
   },
   {
-    Rcode: MON00005,
+    Rcode: 'MON00005',
     maxHp: 100,
     hpPerLv: 10,
     spd: 150,

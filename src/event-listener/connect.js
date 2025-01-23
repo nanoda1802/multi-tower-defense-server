@@ -1,6 +1,7 @@
 import onData from './data.js';
 import onEnd from './end.js';
 import onError from './error.js';
+import { userSession } from '../session/session.js';
 
 /* connection 이벤트 리스너  */
 const onConnection = (socket) => {
@@ -13,6 +14,8 @@ const onConnection = (socket) => {
   socket.on(`data`, onData(socket));
   socket.on(`end`, onEnd(socket));
   socket.on(`error`, onError(socket));
+  // [4] 깡통 유저 생성
+  userSession.setUser(socket);
 };
 
 export default onConnection;

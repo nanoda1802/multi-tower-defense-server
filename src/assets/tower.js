@@ -1,6 +1,6 @@
 const towerData = [
   {
-    Rcode: TOW00001,
+    Rcode: 'TOW00001',
     power: 40,
     powerPerLv: 10,
     range: 300,
@@ -11,7 +11,7 @@ const towerData = [
     extraPerLv: 0.5,
   },
   {
-    Rcode: TOW00002,
+    Rcode: 'TOW00002',
     power: 60,
     powerPerLv: 15,
     range: 400,
@@ -22,7 +22,7 @@ const towerData = [
     extraPerLv: 0,
   },
   {
-    Rcode: TOW00003,
+    Rcode: 'TOW00003',
     power: 20,
     powerPerLv: 5,
     range: 200,
@@ -33,7 +33,7 @@ const towerData = [
     extraPerLv: 1,
   },
   {
-    Rcode: TOW00004,
+    Rcode: 'TOW00004',
     power: 10,
     powerPerLv: 5,
     range: 300,

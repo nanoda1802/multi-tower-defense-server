@@ -3,8 +3,8 @@ import User from './user.class.js';
 class UserSession {
   users = new Map();
 
-  setUser(id, socket, winCount, loseCount, mmr) {
-    const newUser = new User(id, socket, winCount, loseCount, mmr);
+  setUser(socket) {
+    const newUser = new User(socket);
     this.users.set(socket, newUser);
     return newUser;
   }
