@@ -12,7 +12,8 @@ const makePath = (count) => {
     let x = weightX * i;
     if (i === count - 1) x = 1500;
     const y = Math.trunc(Math.random() * 200) + 200;
-    paths.push([x, y]);
+    
+    paths.push({x, y});
   }
 
   return paths;
