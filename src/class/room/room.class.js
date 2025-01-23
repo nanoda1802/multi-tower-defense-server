@@ -20,7 +20,7 @@ class Room {
   setPlayers(users) {
     for (let user of users) {
       user.enterRoom(this.id);
-      this.players.set(user.socket, new Player(user.id, user.socket, this.id, user.sequn));
+      this.players.set(user.socket, new Player(user.id, user.socket, this.id));
     }
     finishMatchHandler(this);
   }
