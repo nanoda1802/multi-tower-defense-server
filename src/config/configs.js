@@ -1,10 +1,17 @@
 import { INITIAL_GOLD, TOWER_COST } from './constants/game.js';
 import userState from './constants/user.js';
 import env from './env/env.js';
+import globalFailCode from './packet/fail.code.js';
 import header from './packet/header.js';
 import PacketType from './packet/packet.type.js';
 
 const config = {
+  failCode: {
+    none: globalFailCode.NONE,
+    unknownError: globalFailCode.UNKNOWN_ERROR,
+    invalidRequest: globalFailCode.INVALID_REQUEST,
+    authenticationFailed: globalFailCode.AUTHENTICATION_FAILED,
+  },
   header: {
     typeByte: header.TYPE_BYTE,
     versionLengthByte: header.VERSION_LENGTH_BYTE,
@@ -15,6 +22,7 @@ const config = {
     registerRequest: PacketType.REGISTER_REQUEST,
     registerResponse: PacketType.REGISTER_RESPONSE,
     loginRequest: PacketType.LOGIN_REQUEST,
+    loginResponse: PacketType.LOGIN_RESPONSE,
     matchRequest: PacketType.MATCH_REQUEST,
     matchStartNotification: PacketType.MATCH_START_NOTIFICATION,
     stateSyncNotification: PacketType.STATE_SYNC_NOTIFICATION,

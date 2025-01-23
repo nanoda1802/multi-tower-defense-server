@@ -1,13 +1,14 @@
 import towerData from '../../assets/tower.js';
 
 class Tower {
-  constructor(towerId, x, y, Rcode) {
+  constructor(towerId, x, y, Rcode, playerId) {
     this.towerId = towerId;
     this.level = 0;
     this.x = x;
     this.y = y;
     this.stat = towerData.find((e) => e.Rcode === Rcode);
     this.lastUpdate = 0;
+    this.playerId = playerId;
   }
 
   isAttackPossible(targetX, targetY) {
