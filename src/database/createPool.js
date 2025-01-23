@@ -11,6 +11,7 @@ const createPool = (envConfig) => {
     connectionLimit: 10,
     queueLimit: 10, //얼마나 대기시켜줄지
   });
+
   const originalQuery = pool.query;
 
   pool.query = (sql, params) => {
@@ -23,4 +24,5 @@ const createPool = (envConfig) => {
 
   return pool;
 };
+
 export default createPool;
