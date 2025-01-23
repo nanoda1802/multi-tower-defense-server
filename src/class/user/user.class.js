@@ -4,7 +4,7 @@ const { userState } = config;
 
 class User {
   // 여기도 roomId 있어야하려나....?
-  constructor(id, socket, winCount, loseCount, mmr, initSequence) {
+  constructor(id, socket, winCount, loseCount, mmr) {
     this.id = id;
     this.roomId = null;
     this.socket = socket;
@@ -14,7 +14,7 @@ class User {
       lose: loseCount,
     };
     this.mmr = mmr;
-    this.sequence = initSequence; // 클라에서 헤더로 주자나?
+    this.sequence = 1; // 클라에서 헤더로 주자나?
   }
 
   enterRoom(roomId) {
@@ -39,8 +39,8 @@ class User {
 
   calculateMmr() {}
 
-  increaseSequence() {
-    return ++this.sequence;
+  getSequence() {
+    return this.sequence++;
   }
 }
 
