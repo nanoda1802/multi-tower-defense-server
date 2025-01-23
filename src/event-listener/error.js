@@ -1,3 +1,3 @@
-const onError = () => () => {};
+const onError = (socket) => () => {};
 
 export default onError;

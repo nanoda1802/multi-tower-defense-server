@@ -13,10 +13,16 @@ class Player {
     this.socket = socket; // 아니면 User 인스턴스를 통째로....? sequence 때문에 고민
     this.roomId = roomId;
     this.opponentId = null; // 일단 기존 기획대로
+    this.highScore = highScore;
+    this.score = 0;
     this.gold = game.initialGold;
     this.base = new Base();
     this.towers = new Map(); // 여기는 뭐로 식별할지 고민해봐야함
     this.monsters = new Map(); // 아마 key에 클라에서 보내주는 monsterNumber를?
+  }
+
+  getScore(point) {
+    this.score += point;
   }
 
   matchOpponent() {} // 룸에서 해주시려나? 일단!
