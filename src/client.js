@@ -31,7 +31,7 @@ client.connect(PORT, HOST, async () => {
 
   try {
     const registerRequestPayload = { id: 'test_id', password: '1234', email: 'test@gmail.com' };
-    const loginRequestPayload = { id: 'test_id', password: 'test_1234' };
+    const loginRequestPayload = { id: 'aaaa4321', password: 'aaaa4321' };
     const matchRequestPayload = {};
 
     // 가입 패킷 테스트
@@ -187,7 +187,7 @@ client.on('data', (data) => {
               // handler(client, payload)
               console.log('서버로부터 응답', payload);
               break;
-            case config.packetType.loginRequest:
+            case config.packetType.loginResponse:
               proto = getProtoMessages().S2CLoginResponse;
               payload = proto.decode(payloadBuffer);
               // handler(client, payload)

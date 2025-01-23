@@ -49,11 +49,10 @@ export const onData = (socket) => async (data) => {
         const version = socket.buffer.slice(versionOffset, versionOffset + versionByte).toString();
         verifyClientVersion(version);
 
+        // 시퀀스 검증
         const sequence = socket.buffer.readUInt32BE(
           packetTypeByte + versionLengthByte + versionByte,
         );
-
-        // 시퀀스 검증
         let expectedSequence = userSession.getUser(socket).getSequence();
         if (sequence === expectedSequence) {
           console.log('시퀀스 검증 통과');
