@@ -4,11 +4,6 @@ import Player from '../in-game/player.class.js';
 class Room {
   constructor(id, users) {
     this.id = id;
-    // 상수들 입니다
-    this.baseHp = 10;
-    this.towerCost = 10;
-    this.initialGold = 10;
-    this.monsterSpawnInterval = 1;
 
     // 변수들 입니다.
     this.roomLevel = 0;
@@ -25,7 +20,7 @@ class Room {
   setPlayers(users) {
     for (let user of users) {
       user.enterRoom(this.id);
-      this.players.set(user.socket, new Player(user.id, user.socket, this.id, user.sequn));
+      this.players.set(user.socket, new Player(user.id, user.socket, this.id));
     }
     finishMatchHandler(this);
   }

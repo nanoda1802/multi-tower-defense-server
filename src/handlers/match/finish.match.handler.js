@@ -11,14 +11,15 @@ import { makeMatchStartNotification } from '../../utils/send-packet/payload/noti
 const finishMatchHandler = (room) => {
   //초기값
   const InitialGameState = makeInitialGameState(
-    room.baseHp,
-    room.towerCost,
-    config.initialGold,
-    room.monsterSpawnInterval,
+    config.game.baseHp,
+    config.game.towerCost,
+    config.game.initialGold,
+    config.game.monsterSpawnInterval,
   );
   //길만들기 // 객체 형태로 관리해 달라고 요청 하기.
-  const monsterPath = makePath(2);
+
   for (let targetPlayer of room.players.values) {
+    const monsterPath = makePath(2);
     //타겟인 플레이어 데이터
     //플레이어 쪽에서 score어랑 highscore 관리 해주기 요청
     const playerData = makeGameState(
@@ -34,7 +35,7 @@ const finishMatchHandler = (room) => {
     );
     let opponentData = {};
     for (let player of room.players.values) {
-      if (targetPlayer.userId === player.userId) {
+      if (targetPlayer.id === player.id) {
         continue;
       }
       // 다른 사람 데이터
