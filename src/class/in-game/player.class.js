@@ -8,7 +8,7 @@ const { game } = config;
 
 class Player {
   /* 베이스, 몬스터, 타워에 필요한 매개변수 말씀해주시면 추가하기 */
-  constructor(userId, socket, roomId, sequence) {
+  constructor(userId, socket, roomId) {
     this.id = userId;
     this.socket = socket; // 아니면 User 인스턴스를 통째로....? sequence 때문에 고민
     this.roomId = roomId;
