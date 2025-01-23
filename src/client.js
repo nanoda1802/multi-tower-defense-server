@@ -17,7 +17,7 @@ const sequenceByte = 4;
 const payloadLengthByte = 4;
 
 const HOST = '127.0.0.1';
-const PORT = 5551;
+const PORT = 5555;
 
 const client = new net.Socket();
 
@@ -26,7 +26,6 @@ let sequence = 1;
 client.connect(PORT, HOST, async () => {
   console.log('Connectied to server');
   await loadProtos();
-  //console.log(Object.keys(getProtoMessages()));
 
   client.buffer = Buffer.alloc(0);
 
@@ -35,9 +34,12 @@ client.connect(PORT, HOST, async () => {
     const loginRequestPayload = { id: 'test_id', password: 'test_1234' };
     const matchRequestPayload = {};
 
-    //sendPacketBuffer(config.packetType.registerRequest, sequence, registerRequestPayload);
+    // 가입 패킷 테스트
+    // sendPacketBuffer(config.packetType.registerRequest, sequence, registerRequestPayload);
+    // 로그인 패킷 테스트
+    // sendPacketBuffer(config.packetType.loginRequest, sequence, loginRequestPayload);
+    // 매칭 패킷 테스트
     sendPacketBuffer(config.packetType.matchRequest, sequence, matchRequestPayload);
-    sequence++;
 
     console.log('C2S 패킷 전송 완료');
   } catch (error) {
@@ -116,7 +118,13 @@ function sendPacketBuffer(type, sequence, payload) {
   // 패킷
   const packetBuffer = Buffer.concat([headerBuffer, payloadBuffer]);
 
+  addSequence();
+
   client.write(packetBuffer);
+}
+
+function addSequence(){
+  sequence++;
 }
 
 client.on('data', (data) => {
@@ -135,15 +143,20 @@ client.on('data', (data) => {
         client.buffer.length >=
         packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte
       ) {
+        // 버전 검증
         let versionOffset = packetTypeByte + versionLengthByte;
         const version = client.buffer.slice(versionOffset, versionOffset + versionByte).toString();
+        if(!version===config.env.clientVersion) return;
 
-        // 버전 검증
-        //verifyClientVersion(version);
-
-        const sequence = client.buffer.readUInt32BE(
+        // 시퀀스 검증
+        const expectedSequence = sequence;
+        const receivedSequence = client.buffer.readUInt32BE(
           packetTypeByte + versionLengthByte + versionByte,
         );
+        if(expectedSequence!==receivedSequence){
+          console.log(`시퀀스 오류. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${receivedSequence}`);
+          return;
+        }
 
         const headerLength =
           packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte;
@@ -160,7 +173,7 @@ client.on('data', (data) => {
           console.log('type:', packetType);
           console.log('versionLength:', versionByte);
           console.log('version:', version);
-          console.log('sequence', sequence);
+          console.log('sequence', receivedSequence);
           console.log('payloadLength', payloadLength);
           console.log('-------------------------------');
 
@@ -181,7 +194,7 @@ client.on('data', (data) => {
               console.log('서버로부터 응답', payload);
               break;
             default:
-              console.log('패킷 타입 : ', packetType);
+              console.log('핸들러가 등록되지 않은 패킷 타입 : ', packetType);
               break;
           }
         }
