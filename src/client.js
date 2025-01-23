@@ -30,16 +30,16 @@ client.connect(PORT, HOST, async () => {
   client.buffer = Buffer.alloc(0);
 
   try {
-    const registerRequestPayload = { id: 'test_id', password: '1234', email: 'test@gmail.com' };
-    const loginRequestPayload = { id: 'aaaa4321', password: 'aaaa4321' };
+    const registerRequestPayload = { id: 'testid', password: '1234', email: 'test@gmail.com' };
+    const loginRequestPayload = { id: 'testid', password: '1234' };
     const matchRequestPayload = {};
 
     // 가입 패킷 테스트
     // sendPacketBuffer(config.packetType.registerRequest, sequence, registerRequestPayload);
     // 로그인 패킷 테스트
-    // sendPacketBuffer(config.packetType.loginRequest, sequence, loginRequestPayload);
+    sendPacketBuffer(config.packetType.loginRequest, sequence, loginRequestPayload);
     // 매칭 패킷 테스트
-    sendPacketBuffer(config.packetType.matchRequest, sequence, matchRequestPayload);
+    // sendPacketBuffer(config.packetType.matchRequest, sequence, matchRequestPayload);
 
     console.log('C2S 패킷 전송 완료');
   } catch (error) {
@@ -123,7 +123,7 @@ function sendPacketBuffer(type, sequence, payload) {
   client.write(packetBuffer);
 }
 
-function addSequence(){
+function addSequence() {
   sequence++;
 }
 
@@ -146,15 +146,17 @@ client.on('data', (data) => {
         // 버전 검증
         let versionOffset = packetTypeByte + versionLengthByte;
         const version = client.buffer.slice(versionOffset, versionOffset + versionByte).toString();
-        if(!version===config.env.clientVersion) return;
+        if (!version === config.env.clientVersion) return;
 
         // 시퀀스 검증
         const expectedSequence = sequence;
         const receivedSequence = client.buffer.readUInt32BE(
           packetTypeByte + versionLengthByte + versionByte,
         );
-        if(expectedSequence!==receivedSequence){
-          console.log(`시퀀스 오류. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${receivedSequence}`);
+        if (expectedSequence !== receivedSequence) {
+          console.log(
+            `시퀀스 오류. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${receivedSequence}`,
+          );
           return;
         }
 

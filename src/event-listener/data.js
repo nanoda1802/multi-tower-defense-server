@@ -89,26 +89,26 @@ export const onData = (socket) => async (data) => {
             case config.packetType.registerRequest:
               proto = getProtoMessages().C2SRegisterRequest;
               payload = proto.decode(payloadBuffer);
-              // registerHandler(socket, payload);
-              response = makeRegisterResponse(true, '가입요청 응답', 0);
-              responsePacket = makePacketBuffer(
-                config.packetType.registerResponse,
-                userSession.getUser(socket).sequence,
-                response,
-              );
-              socket.write(responsePacket);
+              registerHandler(socket, payload);
+              // response = makeRegisterResponse(true, '가입요청 응답', 0);
+              // responsePacket = makePacketBuffer(
+              //   config.packetType.registerResponse,
+              //   userSession.getUser(socket).sequence,
+              //   response,
+              // );
+              // socket.write(responsePacket);
               break;
             case config.packetType.loginRequest:
               proto = getProtoMessages().C2SLoginRequest;
               payload = proto.decode(payloadBuffer);
-              // loginHandler(socket, payload);
-              response = makeLoginResponse(true, '로그인요청 응답', 'test@token', 0);
-              responsePacket = makePacketBuffer(
-                config.packetType.loginResponse,
-                userSession.getUser(socket).sequence,
-                response,
-              );
-              socket.write(responsePacket);
+              loginHandler(socket, payload);
+              // response = makeLoginResponse(true, '로그인요청 응답', 'test@token', 0);
+              // responsePacket = makePacketBuffer(
+              //   config.packetType.loginResponse,
+              //   userSession.getUser(socket).sequence,
+              //   response,
+              // );
+              // socket.write(responsePacket);
               break;
             case config.packetType.matchRequest:
               proto = getProtoMessages().C2SMatchRequest;

@@ -16,9 +16,8 @@ const createPool = (envConfig) => {
   pool.query = (sql, params) => {
     const date = new Date();
     // 쿼리 실행시 로그
-    console.log(
-      `[${date.getFullYear()}] Executing query: ${sql} ${params ? `, ${JSON.stringify(params)}` : ``}`,
-    );
+    console.log(`${date}에 실행된 쿼리 : ${sql}`);
+    console.log(`쿼리의 매개변수 : ${params ? `${JSON.stringify(params)}` : `none`}`);
     return originalQuery.call(pool, sql, params);
   };
 

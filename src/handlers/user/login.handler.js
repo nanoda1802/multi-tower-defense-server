@@ -4,6 +4,7 @@ import config from '../../config/configs.js';
 import { userSession } from '../../session/session.js';
 import makePacketBuffer from '../../utils/send-packet/makePacket.js';
 import { GlobalFailCode } from '../../utils/send-packet/payload/game.data.js';
+import { selectUserData } from '../../database/user/user.db.js';
 // 요청 페이로드 C2SLoginRequest {id,password}
 // 응답 페이로드 S2CLoginResponse {success,message,token,failCode}
 
@@ -39,9 +40,9 @@ const verifyLoginInfo = async (userData, socket, id, password) => {
   verifiedUser.login(
     userData.key,
     userData.id,
-    userData.highScore, // 스키마에 하이스코어도 넣어야해........
-    userData.winCount,
-    userData.loseCount,
+    userData.high_score, 
+    userData.win_count,
+    userData.lose_count,
     userData.mmr,
   );
   // 로그인 성공 페이로드 반환
@@ -52,16 +53,16 @@ const loginHandler = async (socket, payload) => {
   // 페이로드에서 아이디랑 비번 추출
   const { id, password } = payload;
   // DB에서 await select 쿼리로 유저 정보 가져옴
-  const userData = {
-    id: 'aaaa4321',
-    password: 'aaaa4321',
-    email: 'aaaa4321@gmail.com',
-    created_at: 55452342,
-  };
+  const userData = await selectUserData(id);
   // 응답 페이로드 준비
   const responsePayload = await verifyLoginInfo(userData, socket, id, password);
+  const sequence = userSession.getUser(socket).sequence;
   // 패킷 만들어서 버퍼로 변환
-  const S2CLoginResponse = makePacketBuffer(config.packetType.loginResponse, responsePayload);
+  const S2CLoginResponse = makePacketBuffer(
+    config.packetType.loginResponse,
+    sequence,
+    responsePayload,
+  );
   // 클라이언트에 응답 버퍼 보냄
   socket.write(S2CLoginResponse);
 };
