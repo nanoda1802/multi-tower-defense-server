@@ -9,7 +9,7 @@ const attackBaseHandler = (socket, payload) => {
   const player = room.getPlayer(user.id);
   if (!player) return;
 
-  player.base.damaged(room, payload.damage);
+  player.base.damaged(room, user.id, payload.damage);
 };
 
 export default attackBaseHandler;
