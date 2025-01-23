@@ -3,8 +3,21 @@ import { getProtoMessages } from '../init/load.proto.js';
 import {
   makeLoginResponse,
   makeRegisterResponse,
+  makeSpawnMonsterResponse,
+  makeTowerPurchaseResponse,
 } from '../utils/send-packet/payload/response/game.response.js';
 import makePacketBuffer from '../utils/send-packet/makePacket.js';
+import { userSession } from '../session/session.js';
+import { makeMatchStartNotification } from '../utils/send-packet/payload/notification/game.notification.js';
+import {
+  makeBaseData,
+  makeGameState,
+  makeInitialGameState,
+  makeMonsterData,
+  makePosition,
+  makeTowerData,
+} from '../utils/send-packet/payload/game.data.js';
+import loginHandler from '../handlers/user/login.handler.js';
 import registerHandler from '../handlers/user/register.handler.js';
 
 export const onData = (socket) => async (data) => {
@@ -31,15 +44,22 @@ export const onData = (socket) => async (data) => {
         socket.buffer.length >=
         packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte
       ) {
+        // 버전 검증
         let versionOffset = packetTypeByte + versionLengthByte;
         const version = socket.buffer.slice(versionOffset, versionOffset + versionByte).toString();
-
-        // 버전 검증
         verifyClientVersion(version);
 
+        // 시퀀스 검증
         const sequence = socket.buffer.readUInt32BE(
           packetTypeByte + versionLengthByte + versionByte,
         );
+        let expectedSequence = userSession.getUser(socket).getSequence();
+        if (sequence === expectedSequence) {
+          console.log('시퀀스 검증 통과');
+        } else {
+          console.log(`시퀀스 에러. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${sequence}`);
+          return; // 기대 시퀀스가 올 때까지 패킷 무시
+        }
 
         const headerLength =
           packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte;
@@ -69,56 +89,116 @@ export const onData = (socket) => async (data) => {
             case config.packetType.registerRequest:
               proto = getProtoMessages().C2SRegisterRequest;
               payload = proto.decode(payloadBuffer);
-              registerHandler(socket, payload);
-              // response = makeRegisterResponse(true, '가입요청 응답', 0);
-              // responsePacket = makePacketBuffer(config.packetType.registerResponse, response);
-              // socket.write(responsePacket);
+              // registerHandler(socket, payload);
+              response = makeRegisterResponse(true, '가입요청 응답', 0);
+              responsePacket = makePacketBuffer(
+                config.packetType.registerResponse,
+                userSession.getUser(socket).sequence,
+                response,
+              );
+              socket.write(responsePacket);
               break;
             case config.packetType.loginRequest:
               proto = getProtoMessages().C2SLoginRequest;
               payload = proto.decode(payloadBuffer);
-              // handler(socket, payload)
+              // loginHandler(socket, payload);
               response = makeLoginResponse(true, '로그인요청 응답', 'test@token', 0);
-              responsePacket = makePacketBuffer(config.packetType.loginResponse, response);
+              responsePacket = makePacketBuffer(
+                config.packetType.loginResponse,
+                userSession.getUser(socket).sequence,
+                response,
+              );
               socket.write(responsePacket);
               break;
             case config.packetType.matchRequest:
               proto = getProtoMessages().C2SMatchRequest;
               payload = proto.decode(payloadBuffer);
               // handler(socket, payload)
+              let initialGameState = makeInitialGameState(100, 100, 100, 5);
+              let baseData = makeBaseData(100, 100);
+              let towers = [];
+              for (let i = 0; i < 5; i++) towers.push(makeTowerData(i, 0, 0));
+              let monsters = [];
+              for (let i = 0; i < 5; i++) monsters.push(makeMonsterData(i, i, 1));
+              let monsterPath = [];
+              for (let i = 0; i < 10; i++) monsterPath.push(makePosition(i, 0));
+              let basePosition = makePosition(0, 0);
+              let playerData = makeGameState(
+                100,
+                baseData,
+                100,
+                towers,
+                monsters,
+                1,
+                10,
+                monsterPath,
+                basePosition,
+              );
+              let opponentData = makeGameState(
+                100,
+                baseData,
+                100,
+                towers,
+                monsters,
+                1,
+                10,
+                monsterPath,
+                basePosition,
+              );
+              response = makeMatchStartNotification(initialGameState, playerData, opponentData);
+              responsePacket = makePacketBuffer(
+                config.packetType.matchStartNotification,
+                userSession.getUser(socket).sequence,
+                response,
+              );
+              socket.write(responsePacket);
               break;
             case config.packetType.towerPurchaseRequest:
               proto = getProtoMessages().C2STowerPurchaseRequest;
               payload = proto.decode(payloadBuffer);
-              // handler(socket, payload)
+              // towerPurchaseHandler(socket, payload)
+              response = makeTowerPurchaseResponse(1);
+              responsePacket = makePacketBuffer(
+                config.packetType.towerPurchaseResponse,
+                userSession.getUser(socket).sequence,
+                response,
+              );
+              socket.write(responsePacket);
               break;
-            case config.packetType.towerPurchaseRequest:
+            case config.packetType.spawnMonsterRequest:
               proto = getProtoMessages().C2SSpawnMonsterRequest;
               payload = proto.decode(payloadBuffer);
               // handler(socket, payload)
+              response = makeSpawnMonsterResponse(1, 1);
+              responsePacket = makePacketBuffer(
+                config.packetType.spawnMonsterResponse,
+                userSession.getUser(socket).sequence,
+                response,
+              );
+              socket.write(responsePacket);
               break;
-            case config.packetType.towerPurchaseRequest:
+            case config.packetType.towerAttackRequest:
               proto = getProtoMessages().C2STowerAttackRequest;
               payload = proto.decode(payloadBuffer);
               // handler(socket, payload)
               break;
-            case config.packetType.towerPurchaseRequest:
+            case config.packetType.monsterAttackBaseRequest:
               proto = getProtoMessages().C2SMonsterAttackBaseRequest;
               payload = proto.decode(payloadBuffer);
               // handler(socket, payload)
               break;
-            case config.packetType.towerPurchaseRequest:
+            case config.packetType.gameEndRequest:
               proto = getProtoMessages().C2SGameEndRequest;
               payload = proto.decode(payloadBuffer);
               // handler(socket, payload)
               break;
-            case config.packetType.towerPurchaseRequest:
+            case config.packetType.monsterDeathNotification:
               proto = getProtoMessages().C2SMonsterDeathNotification;
               payload = proto.decode(payloadBuffer);
               // handler(socket, payload)
               break;
             default:
-              console.log('패킷 타입 : ', packetType);
+              console.log('정의되지 않은 패킷 타입 : ', packetType);
               break;
           }
         }
@@ -132,12 +212,8 @@ export const onData = (socket) => async (data) => {
 
 const verifyClientVersion = (clientVersion) => {
   if (clientVersion !== config.env.clientVersion) {
-    throw new Error('클라이언트 버전 검증 오류');
+    throw new Error(`클라이언트 버전 검증 오류 ${clientVersion}`);
   }
-};
-
-const getNextSequence = () => {
-  //
 };
 
 export default onData;
