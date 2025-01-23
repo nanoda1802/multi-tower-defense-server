@@ -15,8 +15,8 @@ class Room {
     this.monsterId = 0;
     this.towerId = 0;
 
-    this.monsters = new Map();
-    this.towers = new Map();
+    // this.monsters = new Map();
+    // this.towers = new Map();
     this.players = new Map();
     setPlayers(users);
   }
@@ -44,44 +44,49 @@ class Room {
       monsterSpawnInterval: this.monsterSpawnInterval,
     };
   }
-
-  // 몬스터
-  setMonster(monsterId, Rcode, userId) {
-    const monster = new Monster(monsterId, this.monsterId, this.roomLevel, Rcode, userId);
-    this.monsters.set(this.monsterId, monster);
-    this.monsterId++;
+  getMonsterId() {
+    return this.monsterId++;
   }
-
-  getMonster(monsterId) {
-    if (this.monsters[monsterId] !== undefined) {
-      return this.monsters[monsterId];
-    }
+  getTowerId() {
+    return this.towerId++;
   }
+  // // 몬스터
+  // setMonster(monsterId, Rcode, userId) {
+  //   const monster = new Monster(monsterId, this.monsterId, this.roomLevel, Rcode, userId);
+  //   this.monsters.set(this.monsterId, monster);
+  //   this.monsterId++;
+  // }
 
-  deleteMonster(monsterId) {
-    if (this.monsters[monsterId] !== undefined) {
-      this.monsters.delete(monsterId);
-    }
-  }
+  // getMonster(monsterId) {
+  //   if (this.monsters[monsterId] !== undefined) {
+  //     return this.monsters[monsterId];
+  //   }
+  // }
 
-  // 타워
-  setTower(x, y, Rcode, userId) {
-    const tower = new Tower(this.towerId, x, y, Rcode, userId);
-    this.towers.set(this.towerId, tower);
-    this.towerId++;
-  }
+  // deleteMonster(monsterId) {
+  //   if (this.monsters[monsterId] !== undefined) {
+  //     this.monsters.delete(monsterId);
+  //   }
+  // }
 
-  getTower(towerId) {
-    if (this.towers[towerId] !== undefined) {
-      return this.towers[towerId];
-    }
-  }
+  // // 타워
+  // setTower(x, y, Rcode, userId) {
+  //   const tower = new Tower(this.towerId, x, y, Rcode, userId);
+  //   this.towers.set(this.towerId, tower);
+  //   this.towerId++;
+  // }
 
-  deleteTower(towerId) {
-    if (this.towers[towerId] !== undefined) {
-      this.towers.delete(towerId);
-    }
-  }
+  // getTower(towerId) {
+  //   if (this.towers[towerId] !== undefined) {
+  //     return this.towers[towerId];
+  //   }
+  // }
+
+  // deleteTower(towerId) {
+  //   if (this.towers[towerId] !== undefined) {
+  //     this.towers.delete(towerId);
+  //   }
+  // }
 }
 
 export default Room;
