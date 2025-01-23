@@ -1,3 +1,3 @@
-const onEnd = () => {};
+const onEnd = () => () => {};
 
 export default onEnd;
