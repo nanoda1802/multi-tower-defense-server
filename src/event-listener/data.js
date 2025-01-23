@@ -2,6 +2,7 @@ import config from '../config/configs.js';
 import { getProtoMessages } from '../init/load.proto.js';
 import { makeLoginResponse, makeRegisterResponse } from '../utils/send-packet/payload/response/game.response.js';
 import makePacketBuffer from '../utils/send-packet/makePacket.js';
+import { userSession } from '../session/session.js';
 
 export const onData = (socket) => async (data) => {
   // // | **필드 명** | **타입** | **설명** |
@@ -14,7 +15,7 @@ export const onData = (socket) => async (data) => {
   // // | payload | bytes | 실제 데이터 |
   try {
     socket.buffer = Buffer.concat([socket.buffer, data]);
-
+    
     const packetTypeByte = config.header.typeByte;
     const versionLengthByte = config.header.versionLengthByte;
     let versionByte = null;
@@ -33,9 +34,14 @@ export const onData = (socket) => async (data) => {
         // 버전 검증
         verifyClientVersion(version);
 
+        const S_sequence = userSession.getUser(socket);
+
         const sequence = socket.buffer.readUInt32BE(
           packetTypeByte + versionLengthByte + versionByte,
         );
+
+        if(sequence===S_sequence) console.log('시퀀스 검증 통과');
+        else console.log('시퀀스 오류');
 
         const headerLength =
           packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte;
@@ -130,10 +136,6 @@ const verifyClientVersion = (clientVersion) => {
   if (clientVersion !== config.env.clientVersion) {
     throw new Error('클라이언트 버전 검증 오류');
   }
-};
-
-const getNextSequence = () => {
-  //
 };
 
 export default onData;
