@@ -6,7 +6,9 @@ import { makeBaseData, makeGameState, makeInitialGameState } from '../../utils/s
 import { makeMatchStartNotification } from '../../utils/send-packet/payload/notification/game.notification.js';
 
 const finishMatchHandler = (room) => {
-  console.log("매칭 성공 보내기")
+  let monsterPath = {};
+  let playerData = {}
+  const playerId = [];
   //초기값
   const initialGameState = makeInitialGameState(
     config.game.baseHp,
@@ -14,54 +16,41 @@ const finishMatchHandler = (room) => {
     config.game.initialGold,
     config.game.monsterSpawnInterval,
   );
+  
   //길만들기 // 객체 형태로 관리해 달라고 요청 하기.
-
-  for (let targetPlayer of room.players.values()) {
-    const monsterPath = makePath(4);
-    //타겟인 플레이어 데이터
-    //플레이어 쪽에서 score어랑 highscore 관리 해주기 요청
-    const playerData = makeGameState(
-      targetPlayer.gold,
-      makeBaseData(targetPlayer.base.hp, targetPlayer.base.maxHp) ,
-      targetPlayer.highScore,
+  room.players.forEach((player) => {
+    monsterPath[player.id] = makePath(5)
+    playerData[player.id] = makeGameState(
+      player.gold,
+      makeBaseData(player.base.hp, player.base.maxHp),
+      player.highScore,
       [],
       [],
       room.roomLevel,
-      targetPlayer.score,
-      monsterPath,
-      monsterPath[monsterPath.length - 1],
+      player.score,
+      monsterPath[player.id],
+      monsterPath[player.id][monsterPath[player.id].length - 1],
     );
-    let opponentData = {};
-    for (let player of room.players.values()) {
-      if (targetPlayer.id === player.id) {
-        continue;
-      }
-      // 다른 사람 데이터
-      opponentData = makeGameState(
-        player.gold,
-        makeBaseData(player.base.hp, player.base.maxHp),
-        player.highScore,
-        [],
-        [],
-        room.roomLevel,
-        player.score,
-        monsterPath,
-        monsterPath[monsterPath.length - 1],
-      );
-    }
+    playerId.push(player.id)
+  })
+
+  // 전달
+  room.players.forEach((player) => {
     const S2CMatchStartNotification = makeMatchStartNotification(
       initialGameState,
-      playerData,
-      opponentData,
+      playerData[player.id],
+      playerData[playerId.find((e) => e !== player.id)],
     );
 
     const packet = makePacketBuffer(
       config.packetType.matchStartNotification,
-      userSession.getUser(targetPlayer.socket).sequence,
+      userSession.getUser(player.socket).sequence,
       S2CMatchStartNotification,
     );
-    targetPlayer.socket.write(packet);
-  }
+
+    player.socket.write(packet);
+  })
+
 };
 
 export default finishMatchHandler;
