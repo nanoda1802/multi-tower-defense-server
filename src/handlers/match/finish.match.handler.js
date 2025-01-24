@@ -50,9 +50,6 @@ const finishMatchHandler = (room) => {
     player.socket.write(packet);
   })
 
-
-
-
 };
 
 export default finishMatchHandler;
