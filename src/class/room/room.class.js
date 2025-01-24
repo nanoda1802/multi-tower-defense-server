@@ -32,6 +32,16 @@ class Room {
   getTowerId() {
     return this.towerId++;
   }
+
+  // 핸들러에서 페이로드랑 타입을 만들어줘야하고
+  // 양쪽 아이디도 알아내서 넣어줘야
+
+  // userInfos = [{id,payload,type},{id,payload,type}]
+  notify(userInfos) {
+    for (const info of userInfos) {
+      this.players.getPlayer(info.id).user.sendPacket(info.type, info.payload);
+    }
+  }
 }
 
 export default Room;

@@ -13,12 +13,18 @@ export const killMonsterHandler = (socket, payload) => {
   player.killMonster(monsterId);
   // [4] 상대방 클라이언트에 정보 보내기
   room.players.forEach((player) => {
+    let packet;
     if (player.id === user.id) {
-      return;
+      packet = makePacketBuffer(
+        config.packetType.stateSyncNotification,
+        0,
+        player.makeSyncPayload(),
+      );
+    } else {
+      packet = makePacketBuffer(config.packetType.enemyMonsterDeathNotification, 0, {
+        monsterId,
+      });
     }
-    const packet = makePacketBuffer(config.packetType.enemyMonsterDeathNotification, 0, {
-      monsterId,
-    });
     player.socket.write(packet);
   });
 };
