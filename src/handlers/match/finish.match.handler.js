@@ -1,11 +1,7 @@
 import config from '../../config/configs.js';
 import makePath from '../../utils/path/make.monster.path.js';
 import makePacketBuffer from '../../utils/send-packet/makePacket.js';
-import {
-  makeGameState,
-  makeInitialGameState,
-  makePosition,
-} from '../../utils/send-packet/payload/game.data.js';
+import { makeGameState, makeInitialGameState } from '../../utils/send-packet/payload/game.data.js';
 import { makeMatchStartNotification } from '../../utils/send-packet/payload/notification/game.notification.js';
 
 const finishMatchHandler = (room) => {
@@ -26,12 +22,12 @@ const finishMatchHandler = (room) => {
       targetPlayer.gold,
       targetPlayer.base,
       targetPlayer.highScore,
-      room.towers,
-      room.monsters,
+      targetPlayer.towers,
+      targetPlayer.monsters,
       room.roomLevel,
       targetPlayer.score,
       monsterPath,
-      makePosition(monsterPath[monsterPath.length - 1].x, monsterPath[monsterPath.length - 1].y),
+      monsterPath[monsterPath.length - 1],
     );
     let opponentData = {};
     for (let player of room.players.values) {
@@ -43,12 +39,12 @@ const finishMatchHandler = (room) => {
         player.gold,
         player.base,
         player.highScore,
-        room.towers,
-        room.monsters,
+        player.towers,
+        player.monsters,
         room.roomLevel,
         player.score,
         monsterPath,
-        makePosition(monsterPath[monsterPath.length - 1].x, monsterPath[monsterPath.length - 1].y),
+        monsterPath[monsterPath.length - 1],
       );
     }
     const S2CMatchStartNotification = makeMatchStartNotification(

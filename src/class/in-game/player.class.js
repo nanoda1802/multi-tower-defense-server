@@ -40,15 +40,20 @@ class Player {
     }
   }
   
-  removeTower(towerId) {
-    this.towers.delete(towerId); // 타워 식별자 필요
+  getTower(towerId) {
+    return this.towers.get(towerId);
   }
   spawnMonster(monsterId) {
     this.monsters.set(monsterId, new Monster());
   }
+
   killMonster(monsterId) {
     this.monsters.delete(monsterId);
     // 골드 얻고?
+  }
+
+  getMonster(monsterId) {
+    return this.monsters.ge(monsterId);
   }
 
 
