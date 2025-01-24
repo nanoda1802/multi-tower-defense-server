@@ -30,7 +30,7 @@ const finishMatchHandler = (room) => {
       player.highScore,
       [],
       [],
-      room.roomLevel,
+      room.monsterLevel,
       player.score,
       monsterPath[player.id],
       monsterPath[player.id][monsterPath[player.id].length - 1],

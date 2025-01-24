@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import config from '../../config/configs.js';
 import { userSession } from '../../session/session.js';
-import makePacketBuffer from '../../utils/send-packet/makePacket.js';
 import { GlobalFailCode } from '../../utils/send-packet/payload/game.data.js';
 import { selectUserData } from '../../database/user_db/functions.js';
 
@@ -29,7 +28,7 @@ const makeFailPayload = (type = 'none') => {
 };
 
 /* 요청받은 정보 검증 후 처리하고 적절한 페이로드 준비하는 함수 */
-const verifyLoginInfo = async (socket, id, password) => {
+const verifyLoginInfo = async (user, id, password) => {
   // [1] DB에서 유저 정보 가져오기
   let userData = null;
   try {
@@ -43,11 +42,11 @@ const verifyLoginInfo = async (socket, id, password) => {
       failCode: GlobalFailCode.UNKNOWN_ERROR,
     };
   }
-  // [2] 요청된 유저 정보가 없는 경우
+  // [2] 요청된 유저와 일치하는 정보가 없는 경우
   if (!userData) return makeFailPayload('user');
   // [3] 이미 로그인된 계정인지 검증
-  for (const user of userSession.users.values()) {
-    if (user.id === userData.id) {
+  for (const account of userSession.users.values()) {
+    if (account.id === userData.id) {
       return makeFailPayload('duplicate');
     }
   }
@@ -57,8 +56,7 @@ const verifyLoginInfo = async (socket, id, password) => {
   // [5] 모든 검증 통과 시 jwt 생성
   const token = jwt.sign({ userId: userData.id }, config.env.secretKey);
   // [6] 깡통 유저에 로그인 정보 넣어주기
-  const verifiedUser = userSession.getUser(socket);
-  verifiedUser.login(
+  user.login(
     userData.user_key,
     userData.id,
     userData.high_score,
@@ -76,17 +74,12 @@ const verifyLoginInfo = async (socket, id, password) => {
 const loginHandler = async (socket, payload) => {
   // [1] 요청 페이로드에서 아이디랑 비번 추출
   const { id, password } = payload;
-  // [2] DB 조회 후 정보 검증하고 응답 페이로드 및 시퀀스 준비
-  const responsePayload = await verifyLoginInfo(socket, id, password);
-  const sequence = userSession.getUser(socket).sequence;
-  // [3] 패킷 만들고 버퍼로 변환
-  const S2CLoginResponse = makePacketBuffer(
-    config.packetType.loginResponse,
-    sequence,
-    responsePayload,
-  );
-  // [4] 만든 버퍼 클라이언트에 송신
-  socket.write(S2CLoginResponse);
+  // [2] 로그인 요청한 유저 찾기
+  const user = userSession.getUser(socket);
+  // [3] DB 조회 후 정보 검증하고 응답 페이로드 준비
+  const responsePayload = await verifyLoginInfo(user, id, password);
+  // [4] 패킷 버퍼로 변환해 클라이언트에 송신
+  user.sendPacket(config.packetType.loginResponse, responsePayload);
 };
 
 export default loginHandler;

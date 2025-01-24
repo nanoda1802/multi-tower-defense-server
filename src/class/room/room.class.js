@@ -54,6 +54,11 @@ class Room {
       user.sendPacket(packetType, payload);
     });
   }
+  notify(userInfos) {
+    for (const info of userInfos) {
+      this.players.getPlayer(info.id).user.sendPacket(info.type, info.payload);
+    }
+  }
 }
 
 export default Room;
