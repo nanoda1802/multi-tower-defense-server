@@ -73,90 +73,33 @@ export const onData = (socket) => async (data) => {
           const payloadBuffer = socket.buffer.slice(headerLength, headerLength + payloadLength);
           socket.buffer = socket.buffer.slice(headerLength + payloadLength);
 
-          console.log('------------- 헤더 -------------');
+          const proto = getProtoMessages().GamePacket;
+          const gamePacket = proto.decode(payloadBuffer);
+          const payload = gamePacket[gamePacket.payload];
+
+          console.log('------------- 받는 값 -------------');
           console.log('type:', packetType);
           console.log('versionLength:', versionByte);
           console.log('version:', version);
           console.log('sequence', sequence);
           console.log('payloadLength', payloadLength);
+          console.log('payload', payload);
           console.log('-------------------------------');
 
           // C2S 패킷타입별 핸들러 실행
-          let proto = null;
-          let payload = null;
           let response = null;
           let responsePacket = null;
           switch (packetType) {
             case config.packetType.registerRequest:
-              proto = getProtoMessages().C2SRegisterRequest;
-              payload = proto.decode(payloadBuffer);
               registerHandler(socket, payload);
-              // response = makeRegisterResponse(true, '가입요청 응답', 0);
-              // responsePacket = makePacketBuffer(
-              //   config.packetType.registerResponse,
-              //   userSession.getUser(socket).sequence,
-              //   response,
-              // );
-              // socket.write(responsePacket);
               break;
             case config.packetType.loginRequest:
-              proto = getProtoMessages().C2SLoginRequest;
-              payload = proto.decode(payloadBuffer);
               loginHandler(socket, payload);
-              // response = makeLoginResponse(true, '로그인요청 응답', 'test@token', 0);
-              // responsePacket = makePacketBuffer(
-              //   config.packetType.loginResponse,
-              //   userSession.getUser(socket).sequence,
-              //   response,
-              // );
-              // socket.write(responsePacket);
               break;
             case config.packetType.matchRequest:
-              proto = getProtoMessages().C2SMatchRequest;
-              payload = proto.decode(payloadBuffer);
               addMatchHandler(socket, payload)
-              // let initialGameState = makeInitialGameState(100, 100, 100, 5);
-              // let baseData = makeBaseData(100, 100);
-              // let towers = [];
-              // for (let i = 0; i < 5; i++) towers.push(makeTowerData(i, 0, 0));
-              // let monsters = [];
-              // for (let i = 0; i < 5; i++) monsters.push(makeMonsterData(i, i, 1));
-              // let monsterPath = [];
-              // for (let i = 0; i < 10; i++) monsterPath.push(makePosition(i, 0));
-              // let basePosition = makePosition(0, 0);
-              // let playerData = makeGameState(
-              //   100,
-              //   baseData,
-              //   100,
-              //   towers,
-              //   monsters,
-              //   1,
-              //   10,
-              //   monsterPath,
-              //   basePosition,
-              // );
-              // let opponentData = makeGameState(
-              //   100,
-              //   baseData,
-              //   100,
-              //   towers,
-              //   monsters,
-              //   1,
-              //   10,
-              //   monsterPath,
-              //   basePosition,
-              // );
-              // response = makeMatchStartNotification(initialGameState, playerData, opponentData);
-              // responsePacket = makePacketBuffer(
-              //   config.packetType.matchStartNotification,
-              //   userSession.getUser(socket).sequence,
-              //   response,
-              // );
-              // socket.write(responsePacket);
               break;
             case config.packetType.towerPurchaseRequest:
-              proto = getProtoMessages().C2STowerPurchaseRequest;
-              payload = proto.decode(payloadBuffer);
               // towerPurchaseHandler(socket, payload)
               response = makeTowerPurchaseResponse(1);
               responsePacket = makePacketBuffer(
@@ -167,8 +110,6 @@ export const onData = (socket) => async (data) => {
               socket.write(responsePacket);
               break;
             case config.packetType.spawnMonsterRequest:
-              proto = getProtoMessages().C2SSpawnMonsterRequest;
-              payload = proto.decode(payloadBuffer);
               // handler(socket, payload)
               response = makeSpawnMonsterResponse(1, 1);
               responsePacket = makePacketBuffer(
@@ -179,23 +120,15 @@ export const onData = (socket) => async (data) => {
               socket.write(responsePacket);
               break;
             case config.packetType.towerAttackRequest:
-              proto = getProtoMessages().C2STowerAttackRequest;
-              payload = proto.decode(payloadBuffer);
               // handler(socket, payload)
               break;
             case config.packetType.monsterAttackBaseRequest:
-              proto = getProtoMessages().C2SMonsterAttackBaseRequest;
-              payload = proto.decode(payloadBuffer);
               // handler(socket, payload)
               break;
             case config.packetType.gameEndRequest:
-              proto = getProtoMessages().C2SGameEndRequest;
-              payload = proto.decode(payloadBuffer);
               // handler(socket, payload)
               break;
             case config.packetType.monsterDeathNotification:
-              proto = getProtoMessages().C2SMonsterDeathNotification;
-              payload = proto.decode(payloadBuffer);
               // handler(socket, payload)
               break;
             default:
