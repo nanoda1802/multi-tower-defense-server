@@ -22,12 +22,6 @@ class Player {
     this.monsters = new Map(); // 아마 key에 클라에서 보내주는 monsterNumber를?
   }
 
-  getScore(point) {
-    this.score += point;
-  }
-
-  matchOpponent() {} // 룸에서 해주시려나? 일단!
-
   /* 베이스, 몬스터, 타워에 필요한 매개변수 말씀해주시면 추가하기 */
   placeTower(room, x,y) {
     // 골드가 충분한지 확인
@@ -44,17 +38,19 @@ class Player {
   getTower(towerId) {
     return this.towers.get(towerId);
   }
-  spawnMonster(monsterId) {
-    this.monsters.set(monsterId, new Monster());
+
+  spawnMonster(monsterId, monsterNumber) {
+    this.monsters.set(monsterId, new Monster(monsterId, monsterNumber, this.id));
   }
 
   killMonster(monsterId) {
     this.monsters.delete(monsterId);
-    // 골드 얻고?
+    this.gold += game.monsterGold
+    this.score += game.monsterScore
   }
 
   getMonster(monsterId) {
-    return this.monsters.ge(monsterId);
+    return this.monsters.get(monsterId);
   }
 
 

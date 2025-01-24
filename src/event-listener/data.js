@@ -20,6 +20,11 @@ import {
 import loginHandler from '../handlers/user/login.handler.js';
 import registerHandler from '../handlers/user/register.handler.js';
 import addMatchHandler from '../handlers/match/add.match.handler.js';
+import purchaseTowerHandler from '../handlers/tower/purchase.tower.handler.js';
+import { spawnMonsterHandler } from '../handlers/monster/spawn.monster.handler.js';
+import attackMonsterHandler from '../handlers/tower/attack.monster.handler.js';
+import attackBaseHandler from '../handlers/monster/attack.base.handler.js';
+import { killMonsterHandler } from '../handlers/monster/kill.monster.handler.js';
 
 export const onData = (socket) => async (data) => {
   // // | **필드 명** | **타입** | **설명** |
@@ -100,36 +105,36 @@ export const onData = (socket) => async (data) => {
               addMatchHandler(socket, payload)
               break;
             case config.packetType.towerPurchaseRequest:
-              // towerPurchaseHandler(socket, payload)
-              response = makeTowerPurchaseResponse(1);
-              responsePacket = makePacketBuffer(
-                config.packetType.towerPurchaseResponse,
-                userSession.getUser(socket).sequence,
-                response,
-              );
-              socket.write(responsePacket);
+              purchaseTowerHandler(socket, payload)
+              // response = makeTowerPurchaseResponse(1);
+              // responsePacket = makePacketBuffer(
+              //   config.packetType.towerPurchaseResponse,
+              //   userSession.getUser(socket).sequence,
+              //   response,
+              // );
+              // socket.write(responsePacket);
               break;
             case config.packetType.spawnMonsterRequest:
-              // handler(socket, payload)
-              response = makeSpawnMonsterResponse(1, 1);
-              responsePacket = makePacketBuffer(
-                config.packetType.spawnMonsterResponse,
-                userSession.getUser(socket).sequence,
-                response,
-              );
-              socket.write(responsePacket);
+              spawnMonsterHandler(socket)
+              // response = makeSpawnMonsterResponse(1, 1);
+              // responsePacket = makePacketBuffer(
+              //   config.packetType.spawnMonsterResponse,
+              //   userSession.getUser(socket).sequence,
+              //   response,
+              // );
+              // socket.write(responsePacket);
               break;
             case config.packetType.towerAttackRequest:
-              // handler(socket, payload)
+              attackMonsterHandler(socket,payload)
               break;
             case config.packetType.monsterAttackBaseRequest:
-              // handler(socket, payload)
+              attackBaseHandler(socket, payload)
               break;
             case config.packetType.gameEndRequest:
               // handler(socket, payload)
               break;
             case config.packetType.monsterDeathNotification:
-              // handler(socket, payload)
+              killMonsterHandler(socket, payload)
               break;
             default:
               console.log('정의되지 않은 패킷 타입 : ', packetType);

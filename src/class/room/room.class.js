@@ -24,9 +24,7 @@ class Room {
   }
 
   getPlayer(id) {
-    if (this.players[id] !== undefined) {
-      return this.players[id];
-    }
+    return this.players.get(id);
   }
   getMonsterId() {
     return this.monsterId++;

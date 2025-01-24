@@ -10,7 +10,7 @@ const purchaseTowerHandler = (socket, payload) => {
     if(!user) return
     const room = roomSession.getRoom(user.roomId)
     if(!room) return
-    const player = room.getPlayer(socket)
+    const player = room.getPlayer(user.id)
     if(!player) return 
 
     // 골드 확인 후 towerId 반환
