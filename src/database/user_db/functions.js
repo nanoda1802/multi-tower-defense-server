@@ -9,7 +9,7 @@ const insertUserData = async (id, password, email) => {
   try {
     await connection.beginTransaction();
     await connection.execute(USER_SQL_QUERIES.INSERT_USER, [id, password, email]);
-    await connection.execute(USER_SQL_QUERIES.INSERT_DEFAULT_RANK, [id]);
+    await connection.execute(USER_SQL_QUERIES.INSERT_DEFAULT_RANK);
     // [3 A] 트랜잭션이 무사히 끝나면 쿼리 완료 알리기
     await connection.commit();
   } catch (error) {
