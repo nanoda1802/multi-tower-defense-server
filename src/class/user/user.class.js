@@ -16,8 +16,9 @@ class User {
       win: null,
       lose: null,
     };
-    this.mmr = null;
-    this.sequence = 1; // 클라에서 헤더로 주자나?
+    // 임시 값 저장 (테스트용 후엔 null로 변경해야함)
+    this.mmr = 100; 
+    this.sequence = 1;
   }
 
   login(key, userId, highScore, winCount, loseCount, mmr) {

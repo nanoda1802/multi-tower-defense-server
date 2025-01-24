@@ -22,9 +22,9 @@ const purchaseTowerHandler = (socket, payload) => {
         let packet
         // player가 자신일 경우 response, 상대방일 경우 notification 반환
         if (player.id === user.id)
-            packet = makePacketBuffer(config.packetType.towerPurchaseResponse, { towerId })
+            packet = makePacketBuffer(config.packetType.towerPurchaseResponse, 0, { towerId })
         else
-            packet = makePacketBuffer(config.packetType.addEnemyTowerNotification, { towerId, x, y })
+            packet = makePacketBuffer(config.packetType.addEnemyTowerNotification, 0, { towerId, x, y })
         player.socket.write(packet)
     })
 }

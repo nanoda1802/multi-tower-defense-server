@@ -22,9 +22,9 @@ const attackBaseHandler = (socket, payload) => {
       let packet
       // player가 자신일 경우 패배, 상대방일 경우 승리 정보를 반환
       if (player.id === user.id)
-        packet = makePacketBuffer(config.packetType.gameOverNotification, { isWin: false })
+        packet = makePacketBuffer(config.packetType.gameOverNotification,0, { isWin: false })
       else
-        packet = makePacketBuffer(config.packetType.gameOverNotification, { isWin: true })
+        packet = makePacketBuffer(config.packetType.gameOverNotification,0, { isWin: true })
       player.socket.write(packet)
     })
   // 게임오버가 아닐 시 baseHp 업데이트 전송
@@ -36,7 +36,7 @@ const attackBaseHandler = (socket, payload) => {
       if (player.id === user.id) isOpponent = false
       else isOpponent = true
       // 패킷 생성 후 전달
-      const packet = makePacketBuffer(config.packetType.updateBaseHpNotification, { isOpponent, baseHp })
+      const packet = makePacketBuffer(config.packetType.updateBaseHpNotification, 0,{ isOpponent, baseHp })
       player.socket.write(packet)
     })
   }

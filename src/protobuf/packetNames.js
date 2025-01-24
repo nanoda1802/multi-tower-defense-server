@@ -26,4 +26,5 @@ export const packetNames = [
   'C2SGameEndRequest',
   'C2SMonsterDeathNotification',
   'S2CEnemyMonsterDeathNotification',
+  'GamePacket'
 ];

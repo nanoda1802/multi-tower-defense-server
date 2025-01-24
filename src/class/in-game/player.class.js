@@ -13,7 +13,8 @@ class Player {
     this.socket = socket; // 아니면 User 인스턴스를 통째로....? sequence 때문에 고민
     this.roomId = roomId;
     this.opponentId = null; // 일단 기존 기획대로
-    this.highScore = highScore;
+    // 이부분 생성자에서 나중에 추가 예정
+    this.highScore = 0;
     this.score = 0;
     this.gold = game.initialGold;
     this.base = new Base();
