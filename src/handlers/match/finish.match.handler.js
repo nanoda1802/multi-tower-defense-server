@@ -1,7 +1,8 @@
 import config from '../../config/configs.js';
+import { userSession } from '../../session/session.js';
 import makePath from '../../utils/path/make.monster.path.js';
 import makePacketBuffer from '../../utils/send-packet/makePacket.js';
-import { makeGameState, makeInitialGameState } from '../../utils/send-packet/payload/game.data.js';
+import { makeBaseData, makeGameState, makeInitialGameState } from '../../utils/send-packet/payload/game.data.js';
 import { makeMatchStartNotification } from '../../utils/send-packet/payload/notification/game.notification.js';
 
 const finishMatchHandler = (room) => {
@@ -21,10 +22,10 @@ const finishMatchHandler = (room) => {
     //플레이어 쪽에서 score어랑 highscore 관리 해주기 요청
     const playerData = makeGameState(
       targetPlayer.gold,
-      targetPlayer.base,
+      makeBaseData(targetPlayer.base.hp, targetPlayer.base.maxHp) ,
       targetPlayer.highScore,
-      targetPlayer.towers,
-      targetPlayer.monsters,
+      [],
+      [],
       room.roomLevel,
       targetPlayer.score,
       monsterPath,
@@ -38,10 +39,10 @@ const finishMatchHandler = (room) => {
       // 다른 사람 데이터
       opponentData = makeGameState(
         player.gold,
-        player.base,
+        makeBaseData(player.base.hp, player.base.maxHp),
         player.highScore,
-        player.towers,
-        player.monsters,
+        [],
+        [],
         room.roomLevel,
         player.score,
         monsterPath,
@@ -56,7 +57,7 @@ const finishMatchHandler = (room) => {
 
     const packet = makePacketBuffer(
       config.packetType.matchStartNotification,
-      0,
+      userSession.getUser(targetPlayer.socket).sequence,
       S2CMatchStartNotification,
     );
     targetPlayer.socket.write(packet);

@@ -5,7 +5,7 @@ class Base {
   }
 
   damaged(damage) {
-    if (this.hp - damage > 0) this.hp -= monster.atk;
+    if (this.hp - damage > 0) this.hp -= damage;
     else this.hp = 0
   }
 

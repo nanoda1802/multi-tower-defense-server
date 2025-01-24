@@ -3,8 +3,8 @@ const makePath = (count) => {
   // 만약 count가 2개 이하이면 기본값 직선으로 반환
   if (count <= 2)
     return [
-      [0, 350],
-      [1500, 350],
+      {x: 0, y: 350},
+      {x: 1500,y: 350},
     ];
   const weightX = Math.trunc(1500 / (count - 1));
 

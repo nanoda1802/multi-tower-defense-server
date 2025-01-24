@@ -17,7 +17,7 @@ class Player {
     this.highScore = 0;
     this.score = 0;
     this.gold = game.initialGold;
-    this.base = new Base();
+    this.base = new Base(game.baseHp);
     this.towers = new Map(); // 여기는 뭐로 식별할지 고민해봐야함
     this.monsters = new Map(); // 아마 key에 클라에서 보내주는 monsterNumber를?
   }
