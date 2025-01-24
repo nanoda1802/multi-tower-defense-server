@@ -6,7 +6,7 @@ class Room {
     this.id = id;
 
     // 변수들 입니다.
-    this.roomLevel = 0;
+    this.monsterLevel = 1;
     this.monsterId = 1;
     this.towerId = 1;
 

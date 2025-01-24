@@ -4,7 +4,6 @@ import config from '../../config/configs.js';
 const { userState } = config;
 
 class User {
-  // 여기도 roomId 있어야하려나....?
   constructor(socket) {
     this.key = null;
     this.id = null;
@@ -17,8 +16,7 @@ class User {
       win: null,
       lose: null,
     };
-    // 임시 값 저장 (테스트용 후엔 null로 변경해야함)
-    this.mmr = 100;
+    this.mmr = null;
     this.sequence = 1;
   }
 
@@ -61,11 +59,11 @@ class User {
     //패킷타입 (number -> string)
     const packetTypeValues = Object.values(config.packetType);
     const packetTypeIndex = packetTypeValues.findIndex((f) => f === packetType);
-    const packeTypeName = Object.keys(config.packetType)[packetTypeIndex];
+    const packetTypeName = Object.keys(config.packetType)[packetTypeIndex];
 
     // 페이로드
     const proto = getProtoMessages().GamePacket;
-    const message = proto.create({ [packeTypeName]: payload });
+    const message = proto.create({ [packetTypeName]: payload });
     const payloadBuffer = proto.encode(message).finish();
 
     // 헤더 필드값
@@ -76,7 +74,7 @@ class User {
     if (true) {
       // 콘솔로그 필터링하려면 조건 입력
       console.log('------------- 주는 값 -------------');
-      console.log(`type: ${packetType}.${packeTypeName}`);
+      console.log(`type: ${packetType}.${packetTypeName}`);
       console.log('versionLength:', versionLength);
       console.log('version:', version);
       console.log('sequence:', this.sequence);
@@ -115,8 +113,8 @@ class User {
 
     // 패킷
     const packetBuffer = Buffer.concat([headerBuffer, payloadBuffer]);
-
-    this.socket.write(packet);
+    // 메서드 합치다가 여기 그냥 packet이여서 오류 남!! packetBuffer로 변경
+    this.socket.write(packetBuffer);
   }
 }
 
