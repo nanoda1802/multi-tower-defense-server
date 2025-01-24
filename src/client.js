@@ -195,6 +195,12 @@ client.on('data', (data) => {
               // handler(client, payload)
               console.log('서버로부터 응답', payload);
               break;
+            case config.packetType.matchStartNotification:
+              proto = getProtoMessages().S2CMatchStartNotification;
+              payload = proto.decode(payloadBuffer);
+              // handler(client, payload)
+              console.log('서버로부터 응답', JSON.stringify(payload, null, 2));
+              break;
             default:
               console.log('핸들러가 등록되지 않은 패킷 타입 : ', packetType);
               break;
