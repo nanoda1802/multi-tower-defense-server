@@ -45,14 +45,7 @@ const finishMatchHandler = (room) => {
       playerData[player.id],
       playerData[playerId.find((e) => e !== player.id)],
     );
-
-    const packet = makePacketBuffer(
-      config.packetType.matchStartNotification,
-      userSession.getUser(player.socket).sequence,
-      S2CMatchStartNotification,
-    );
-
-    player.socket.write(packet);
+    player.user.sendPacket(config.packetType.matchStartNotification, S2CMatchStartNotification);
   });
 };
 
