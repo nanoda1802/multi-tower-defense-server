@@ -9,12 +9,16 @@ export const killMonsterHandler = (socket, payload) => {
     const user = userSession.getUser(socket);
     const room = roomSession.getRoom(user.roomId);
     const player = room.getPlayer(socket);
-    const enemyPlayer = room.getEnemyPlayer(socket);
     // [3] 몬스터 사망 처리
     player.killMonster(monsterId);
     // [4] 상대방 클라이언트에 정보 보내기
-    let enemyPacket = makePacketBuffer(config.packetType.enemyMonsterDeathNotification, sequence, {monsterId});
-    enemyPlayer.socket.write(enemyPacket);
+    room.players.forEach((player) => {
+        if (player.id === user.id) {
+            return
+        } 
+        const packet = makePacketBuffer(config.packetType.enemyMonsterDeathNotification, 0, {monsterId});
+        player.socket.write(packet);
+    });
 }
 
 
