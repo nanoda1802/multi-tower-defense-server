@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
 import config from '../../config/configs.js';
-import makePacketBuffer from '../../utils/send-packet/makePacket.js';
 import { GlobalFailCode } from '../../utils/send-packet/payload/game.data.js';
 import { userSession } from '../../session/session.js';
 import { insertUserData } from '../../database/user_db/functions.js';
@@ -70,17 +69,12 @@ const validateRegisterInfo = async (id, password, email) => {
 const registerHandler = async (socket, payload) => {
   // [1] 요청 페이로드에서 가입 정보 추출
   const { id, password, email } = payload;
-  // [2] 가입 정보 검증 후 응답 페이로드 및 시퀀스 준비
+  // [2] 가입 정보 검증 후 응답 페이로드 준비
   const responsePayload = await validateRegisterInfo(id, password, email);
-  const sequence = userSession.getUser(socket).sequence;
-  // [3] 패킷 만들고 버퍼로 변환
-  const S2CRegisterResponse = makePacketBuffer(
-    config.packetType.registerResponse,
-    sequence,
-    responsePayload,
-  );
-  // [4] 만든 버퍼 클라이언트에 송신
-  socket.write(S2CRegisterResponse);
+  // [3] 패킷 보낼 유저 찾기
+  const user = userSession.getUser(socket);
+  // [4] 패킷 버퍼로 변환해 클라이언트에 송신
+  user.sendPacket(config.packetType.registerResponse, responsePayload);
 };
 
 export default registerHandler;

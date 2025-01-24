@@ -13,7 +13,7 @@ const attackMonsterHandler = (socket, payload) => {
     const player = room.getPlayer(user.id);
     if (!player) return;
     const monster = player.getMonster(monsterId);
-    if (!monster) return;
+    // if (!monster) return;
     const tower = player.getTower(towerId);
     if (!tower) return;
 
