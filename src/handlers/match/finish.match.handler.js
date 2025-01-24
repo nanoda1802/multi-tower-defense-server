@@ -5,8 +5,9 @@ import { makeGameState, makeInitialGameState } from '../../utils/send-packet/pay
 import { makeMatchStartNotification } from '../../utils/send-packet/payload/notification/game.notification.js';
 
 const finishMatchHandler = (room) => {
+  console.log("매칭 성공 보내기")
   //초기값
-  const InitialGameState = makeInitialGameState(
+  const initialGameState = makeInitialGameState(
     config.game.baseHp,
     config.game.towerCost,
     config.game.initialGold,
@@ -14,7 +15,7 @@ const finishMatchHandler = (room) => {
   );
   //길만들기 // 객체 형태로 관리해 달라고 요청 하기.
 
-  for (let targetPlayer of room.players.values) {
+  for (let targetPlayer of room.players.values()) {
     const monsterPath = makePath(2);
     //타겟인 플레이어 데이터
     //플레이어 쪽에서 score어랑 highscore 관리 해주기 요청
@@ -30,7 +31,7 @@ const finishMatchHandler = (room) => {
       monsterPath[monsterPath.length - 1],
     );
     let opponentData = {};
-    for (let player of room.players.values) {
+    for (let player of room.players.values()) {
       if (targetPlayer.id === player.id) {
         continue;
       }
@@ -48,7 +49,7 @@ const finishMatchHandler = (room) => {
       );
     }
     const S2CMatchStartNotification = makeMatchStartNotification(
-      InitialGameState,
+      initialGameState,
       playerData,
       opponentData,
     );

@@ -11,7 +11,7 @@ class Room {
     this.towerId = 0;
 
     this.players = new Map();
-    setPlayers(users);
+    this.setPlayers(users);
   }
 
   // 플레이어 관련

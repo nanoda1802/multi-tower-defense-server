@@ -4,7 +4,7 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx nodemon src/server.js",
     "migration": "node src/database/migration/createSchemas.js"
   },
   "keywords": [],

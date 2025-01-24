@@ -71,7 +71,7 @@ function makePacketBuffer(packetType, sequence, payload) {
   const versionLength = version.length;
   const payloadLength = payloadBuffer.length;
 
-  console.log('------------- 헤더 -------------');
+  console.log('------------- 주는 값 -------------');
   console.log('type:', packetType);
   console.log('versionLength:', versionLength);
   console.log('version:', version);
