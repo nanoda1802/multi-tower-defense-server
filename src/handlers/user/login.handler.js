@@ -9,6 +9,7 @@ import { selectUserData } from '../../database/user_db/functions.js';
 /* 응답 메세지 유형 */
 const messageType = {
   user: '유저 정보를 찾을 수 없슴다!',
+  duplicate: '이미 접속된 계정임다!',
   password: '비밀번호가 일치하지 않슴다!',
   none: '알 수 없는 이유로 로그인에 실패했슴다!',
   success: '로그인 성공임다!!',
@@ -44,12 +45,18 @@ const verifyLoginInfo = async (socket, id, password) => {
   }
   // [2] 요청된 유저 정보가 없는 경우
   if (!userData) return makeFailPayload('user');
-  // [3] 비밀번호 일치 여부 검증
+  // [3] 이미 로그인된 계정인지 검증
+  for (const user of userSession.users.values()) {
+    if (user.id === userData.id) {
+      return makeFailPayload('duplicate');
+    }
+  }
+  // [4] 비밀번호 일치 여부 검증
   const isRightPassword = await bcrypt.compare(password, userData.password);
   if (!isRightPassword) return makeFailPayload('password');
-  // [4] 모든 검증 통과 시 jwt 생성
-  const token = jwt.sign({ userId: id }, config.env.secretKey);
-  // [5] 깡통 유저에 로그인 정보 넣어주기
+  // [5] 모든 검증 통과 시 jwt 생성
+  const token = jwt.sign({ userId: userData.id }, config.env.secretKey);
+  // [6] 깡통 유저에 로그인 정보 넣어주기
   const verifiedUser = userSession.getUser(socket);
   verifiedUser.login(
     userData.key,
@@ -59,7 +66,7 @@ const verifyLoginInfo = async (socket, id, password) => {
     userData.lose_count,
     userData.mmr,
   );
-  // [6] 성공 응답 페이로드 반환
+  // [7] 성공 응답 페이로드 반환
   return { success: true, message: messageType.success, token, failCode: GlobalFailCode.NONE };
 };
 
