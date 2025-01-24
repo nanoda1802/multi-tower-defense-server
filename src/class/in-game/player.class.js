@@ -42,8 +42,8 @@ class Player {
     return this.towers.get(towerId);
   }
 
-  spawnMonster(monsterId, monsterNumber) {
-    this.monsters.set(monsterId, new Monster(monsterId, monsterNumber, this.id));
+  spawnMonster(monsterId, monsterNumber, level) {
+    this.monsters.set(monsterId, new Monster(monsterId, monsterNumber, this.id, level));
   }
 
   killMonster(monsterId) {

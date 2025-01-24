@@ -3,10 +3,10 @@ import towerData from '../../assets/tower.js';
 class Tower {
   constructor(towerId, x, y, Rcode, playerId) {
     this.towerId = towerId;
-    this.level = 0;
     this.x = x;
     this.y = y;
     this.stat = towerData.find((e) => e.Rcode === Rcode);
+    this.damage = 0;
     this.lastUpdate = 0;
     this.playerId = playerId;
   }
@@ -25,12 +25,12 @@ class Tower {
     return true
   }
 
-  levelUp() {
-    this.level++;
+  setLevel(level) {
+    this.damage = this.stat.power + level * this.stat.powerPerLv;
   }
 
   getDamage() {
-    return this.stat.power + this.level * this.stat.powerPerLv;
+    return this.damage
   }
 }
 
