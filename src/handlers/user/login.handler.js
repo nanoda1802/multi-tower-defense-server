@@ -4,9 +4,9 @@ import config from '../../config/configs.js';
 import { userSession } from '../../session/session.js';
 import makePacketBuffer from '../../utils/send-packet/makePacket.js';
 import { GlobalFailCode } from '../../utils/send-packet/payload/game.data.js';
-// 요청 페이로드 C2SLoginRequest {id,password}
-// 응답 페이로드 S2CLoginResponse {success,message,token,failCode}
+import { selectUserData } from '../../database/user_db/functions.js';
 
+/* 응답 메세지 유형 */
 const messageType = {
   user: '유저 정보를 찾을 수 없슴다!',
   password: '비밀번호가 일치하지 않슴다!',
@@ -14,55 +14,71 @@ const messageType = {
   success: '로그인 성공임다!!',
 };
 
+/* 실패 응답 페이로드 제작 함수 */
 const makeFailPayload = (type = 'none') => {
   // [1] 상황별 메세지 구분
-  let message = messageType[type];
+  const message = messageType[type];
   // [2] 실패 응답 페이로드 반환
   return {
     success: false,
     message,
-    token: 'none',
+    token: 'empty',
     failCode: GlobalFailCode.INVALID_REQUEST,
   };
 };
 
-const verifyLoginInfo = async (userData, socket, id, password) => {
-  // db에 요청된 유저 정보가 없는 경우
+/* 요청받은 정보 검증 후 처리하고 적절한 페이로드 준비하는 함수 */
+const verifyLoginInfo = async (socket, id, password) => {
+  // [1] DB에서 유저 정보 가져오기
+  let userData = null;
+  try {
+    userData = await selectUserData(id);
+  } catch (err) {
+    // [1 -> 실패] 오류 출력
+    console.error('로그인 처리 중 문제 발생!!', err);
+    return {
+      success: false,
+      message: `DB 문제 발생 : ${err.code}`,
+      failCode: GlobalFailCode.UNKNOWN_ERROR,
+    };
+  }
+  // [2] 요청된 유저 정보가 없는 경우
   if (!userData) return makeFailPayload('user');
-  // 비밀번호 일치 검증
+  // [3] 비밀번호 일치 여부 검증
   const isRightPassword = await bcrypt.compare(password, userData.password);
   if (!isRightPassword) return makeFailPayload('password');
-  // jwt 생성
+  // [4] 모든 검증 통과 시 jwt 생성
   const token = jwt.sign({ userId: id }, config.env.secretKey);
-  // 깡통 유저에 정보 넣어줌
+  // [5] 깡통 유저에 로그인 정보 넣어주기
   const verifiedUser = userSession.getUser(socket);
   verifiedUser.login(
     userData.key,
     userData.id,
-    userData.highScore, // 스키마에 하이스코어도 넣어야해........
-    userData.winCount,
-    userData.loseCount,
+    userData.high_score,
+    userData.win_count,
+    userData.lose_count,
     userData.mmr,
   );
-  // 로그인 성공 페이로드 반환
+  // [6] 성공 응답 페이로드 반환
   return { success: true, message: messageType.success, token, failCode: GlobalFailCode.NONE };
 };
 
+/* !!! 로그인 핸들러 !!! */
+// 요청 페이로드 C2SLoginRequest {id,password}
+// 응답 페이로드 S2CLoginResponse {success,message,token,failCode}
 const loginHandler = async (socket, payload) => {
-  // 페이로드에서 아이디랑 비번 추출
+  // [1] 요청 페이로드에서 아이디랑 비번 추출
   const { id, password } = payload;
-  // DB에서 await select 쿼리로 유저 정보 가져옴
-  const userData = {
-    id: 'aaaa4321',
-    password: 'aaaa4321',
-    email: 'aaaa4321@gmail.com',
-    created_at: 55452342,
-  };
-  // 응답 페이로드 준비
-  const responsePayload = await verifyLoginInfo(userData, socket, id, password);
-  // 패킷 만들어서 버퍼로 변환
-  const S2CLoginResponse = makePacketBuffer(config.packetType.loginResponse, 0,responsePayload);
-  // 클라이언트에 응답 버퍼 보냄
+  // [2] DB 조회 후 정보 검증하고 응답 페이로드 및 시퀀스 준비
+  const responsePayload = await verifyLoginInfo(socket, id, password);
+  const sequence = userSession.getUser(socket).sequence;
+  // [3] 패킷 만들고 버퍼로 변환
+  const S2CLoginResponse = makePacketBuffer(
+    config.packetType.loginResponse,
+    sequence,
+    responsePayload,
+  );
+  // [4] 만든 버퍼 클라이언트에 송신
   socket.write(S2CLoginResponse);
 };
 
