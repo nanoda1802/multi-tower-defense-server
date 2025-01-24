@@ -187,25 +187,26 @@ class Client {
   }
 }
 
-/////////////////////////////// 테스트 코드 //////////////////////////////////////////////
+/////////////////////////////// 테스트 로직 //////////////////////////////////////////////
 await loadProtos().then(matchTest);
 
 async function matchTest() {
-  // 테스트 로직
-  const client1 = new Client('test1', '1234');
-  const client2 = new Client('test2', '1234');
-  await delay(1000);
-  client1.loginRequestTest();
-  await delay(1000);
-  client2.loginRequestTest();
-  await delay(1000);
-  client1.matchRequestTest();
-  await delay(1000);
-  client2.matchRequestTest();
+  for (let i = 1; i <= 10; i+=2) {
+    const id1 = 'test' + i;
+    const id2 = 'test' + (i+1);
+    const password = '1234';
+    const client1 = new Client(id1, password);
+    const client2 = new Client(id2, password);
+    client1.loginRequestTest();
+    client2.loginRequestTest();
+    await delay(100);
+    client1.matchRequestTest();
+    client2.matchRequestTest();
+    await delay(100);
+  }
 }
 
 async function loginTest() {
-  // 테스트 로직
   for (let i = 1; i <= 100; i++) {
     const id = 'test' + i;
     const password = '1234';
