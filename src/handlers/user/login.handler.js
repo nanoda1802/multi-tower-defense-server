@@ -59,7 +59,7 @@ const verifyLoginInfo = async (socket, id, password) => {
   // [6] 깡통 유저에 로그인 정보 넣어주기
   const verifiedUser = userSession.getUser(socket);
   verifiedUser.login(
-    userData.key,
+    userData.user_key,
     userData.id,
     userData.high_score,
     userData.win_count,
