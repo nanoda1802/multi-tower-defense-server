@@ -30,16 +30,16 @@ client.connect(PORT, HOST, async () => {
   client.buffer = Buffer.alloc(0);
 
   try {
-    const registerRequestPayload = { id: 'test_id', password: '1234', email: 'test@gmail.com' };
-    const loginRequestPayload = { id: 'aaaa4321', password: 'aaaa4321' };
+    const registerRequestPayload = { id: 'testid', password: '1234', email: 'test@gmail.com' };
+    const loginRequestPayload = { id: 'testid', password: '1234' };
     const matchRequestPayload = {};
 
     // 가입 패킷 테스트
     // sendPacketBuffer(config.packetType.registerRequest, sequence, registerRequestPayload);
     // 로그인 패킷 테스트
-    // sendPacketBuffer(config.packetType.loginRequest, sequence, loginRequestPayload);
+    sendPacketBuffer(config.packetType.loginRequest, sequence, loginRequestPayload);
     // 매칭 패킷 테스트
-    sendPacketBuffer(config.packetType.matchRequest, sequence, matchRequestPayload);
+    // sendPacketBuffer(config.packetType.matchRequest, sequence, matchRequestPayload);
 
     console.log('C2S 패킷 전송 완료');
   } catch (error) {

@@ -11,23 +11,18 @@ class Tower {
     this.playerId = playerId;
   }
 
-  isAttackPossible(targetX, targetY) {
+  attackMonster(monster) {
     const timeDiff = Date.now() - this.lastUpdate;
-
-    // 위치 정보 확인
-    if (
-      this.x + this.stat.range / 2 > targetX ||
-      this.x - this.stat.range / 2 < targetX ||
-      this.y + this.stat.range / 2 > targetY ||
-      this.y - this.stat.range / 2 < targetY
-    )
-      return false;
-
     // 공격 쿨타임 확인
-    if (timeDiff < this.stat.coolDown) return false;
+    if (timeDiff < this.stat.coolDown) return false
+    // 위치 정보 확인
+    const distance = Math.floor(Math.sqrt((this.x - targetX)** 2 + (this.y - targetY)** 2))
+    if (distance > this.stat.range) return false
 
+    // 몬스터 공격 적용
+    monster.damaged(this.getDamage())
     this.lastUpdate = Date.now();
-    return true;
+    return true
   }
 
   levelUp() {

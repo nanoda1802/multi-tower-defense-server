@@ -12,18 +12,16 @@ class WaitingQueue {
     if (!this.queue.has(user)) {
       this.queue.add(user);
     }
-    if (this.queue > 1 && !this.isMatching) {
-      startMatch();
+    if (this.queue.size > 1 && !this.isMatching) {
+      this.startMatch();
     }
   }
   // 유저 취소 용도
   dequeueUser(user) {
-    if (!this.queue.has(user)) {
-      this.queue.delete(user);
-    }
+    if (this.queue.has(user)) this.queue.delete(user);
   }
   // 매칭 시작
-  startMatch() {
+  startMatch = () => {
     if (this.queue.size < 2) {
       this.isMatching = false;
       return;
@@ -42,19 +40,19 @@ class WaitingQueue {
         if (targetUser === user) {
           continue;
         }
-        if (Math.abs(user.mmr - targetUser.mmr) <= mmrRange) {
+        if (Math.abs(user.mmr - targetUser.mmr) <= this.mmrRange) {
           this.onFoundMatch([targetUser, user]);
           isMatchFound = true;
           break;
         }
       }
     }
-    setTimeout(startMatch, 1000);
+    setTimeout(this.startMatch, 1000);
   }
   //매칭 성공
   onFoundMatch(users) {
     for (let user of users) {
-      dequeueUser(user);
+      this.dequeueUser(user);
     }
     roomSession.addRoom(users);
   }

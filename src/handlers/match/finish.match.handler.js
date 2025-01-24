@@ -1,40 +1,38 @@
 import config from '../../config/configs.js';
 import makePath from '../../utils/path/make.monster.path.js';
 import makePacketBuffer from '../../utils/send-packet/makePacket.js';
-import {
-  makeGameState,
-  makeInitialGameState,
-  makePosition,
-} from '../../utils/send-packet/payload/game.data.js';
+import { makeGameState, makeInitialGameState } from '../../utils/send-packet/payload/game.data.js';
 import { makeMatchStartNotification } from '../../utils/send-packet/payload/notification/game.notification.js';
 
 const finishMatchHandler = (room) => {
+  console.log("매칭 성공 보내기")
   //초기값
-  const InitialGameState = makeInitialGameState(
-    room.baseHp,
-    room.towerCost,
-    config.initialGold,
-    room.monsterSpawnInterval,
+  const initialGameState = makeInitialGameState(
+    config.game.baseHp,
+    config.game.towerCost,
+    config.game.initialGold,
+    config.game.monsterSpawnInterval,
   );
   //길만들기 // 객체 형태로 관리해 달라고 요청 하기.
-  const monsterPath = makePath(2);
-  for (let targetPlayer of room.players.values) {
+
+  for (let targetPlayer of room.players.values()) {
+    const monsterPath = makePath(2);
     //타겟인 플레이어 데이터
     //플레이어 쪽에서 score어랑 highscore 관리 해주기 요청
     const playerData = makeGameState(
       targetPlayer.gold,
       targetPlayer.base,
       targetPlayer.highScore,
-      room.towers,
-      room.monsters,
+      targetPlayer.towers,
+      targetPlayer.monsters,
       room.roomLevel,
       targetPlayer.score,
       monsterPath,
-      makePosition(monsterPath[monsterPath.length - 1].x, monsterPath[monsterPath.length - 1].y),
+      monsterPath[monsterPath.length - 1],
     );
     let opponentData = {};
-    for (let player of room.players.values) {
-      if (targetPlayer.userId === player.userId) {
+    for (let player of room.players.values()) {
+      if (targetPlayer.id === player.id) {
         continue;
       }
       // 다른 사람 데이터
@@ -42,21 +40,23 @@ const finishMatchHandler = (room) => {
         player.gold,
         player.base,
         player.highScore,
-        room.towers,
-        room.monsters,
+        player.towers,
+        player.monsters,
         room.roomLevel,
         player.score,
         monsterPath,
-        makePosition(monsterPath[monsterPath.length - 1].x, monsterPath[monsterPath.length - 1].y),
+        monsterPath[monsterPath.length - 1],
       );
     }
     const S2CMatchStartNotification = makeMatchStartNotification(
-      InitialGameState,
+      initialGameState,
       playerData,
       opponentData,
     );
+
     const packet = makePacketBuffer(
       config.packetType.matchStartNotification,
+      0,
       S2CMatchStartNotification,
     );
     targetPlayer.socket.write(packet);
