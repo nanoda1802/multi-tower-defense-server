@@ -16,6 +16,7 @@ const finishMatchHandler = (room) => {
     config.game.initialGold,
     config.game.monsterSpawnInterval,
   );
+  
   //길만들기 // 객체 형태로 관리해 달라고 요청 하기.
   room.players.forEach((player) => {
     monsterPath[player.id] = makePath(5)
