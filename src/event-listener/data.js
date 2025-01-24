@@ -19,6 +19,7 @@ import {
 } from '../utils/send-packet/payload/game.data.js';
 import loginHandler from '../handlers/user/login.handler.js';
 import registerHandler from '../handlers/user/register.handler.js';
+import addMatchHandler from '../handlers/match/add.match.handler.js';
 
 export const onData = (socket) => async (data) => {
   // // | **필드 명** | **타입** | **설명** |
@@ -113,45 +114,45 @@ export const onData = (socket) => async (data) => {
             case config.packetType.matchRequest:
               proto = getProtoMessages().C2SMatchRequest;
               payload = proto.decode(payloadBuffer);
-              // handler(socket, payload)
-              let initialGameState = makeInitialGameState(100, 100, 100, 5);
-              let baseData = makeBaseData(100, 100);
-              let towers = [];
-              for (let i = 0; i < 5; i++) towers.push(makeTowerData(i, 0, 0));
-              let monsters = [];
-              for (let i = 0; i < 5; i++) monsters.push(makeMonsterData(i, i, 1));
-              let monsterPath = [];
-              for (let i = 0; i < 10; i++) monsterPath.push(makePosition(i, 0));
-              let basePosition = makePosition(0, 0);
-              let playerData = makeGameState(
-                100,
-                baseData,
-                100,
-                towers,
-                monsters,
-                1,
-                10,
-                monsterPath,
-                basePosition,
-              );
-              let opponentData = makeGameState(
-                100,
-                baseData,
-                100,
-                towers,
-                monsters,
-                1,
-                10,
-                monsterPath,
-                basePosition,
-              );
-              response = makeMatchStartNotification(initialGameState, playerData, opponentData);
-              responsePacket = makePacketBuffer(
-                config.packetType.matchStartNotification,
-                userSession.getUser(socket).sequence,
-                response,
-              );
-              socket.write(responsePacket);
+              addMatchHandler(socket, payload)
+              // let initialGameState = makeInitialGameState(100, 100, 100, 5);
+              // let baseData = makeBaseData(100, 100);
+              // let towers = [];
+              // for (let i = 0; i < 5; i++) towers.push(makeTowerData(i, 0, 0));
+              // let monsters = [];
+              // for (let i = 0; i < 5; i++) monsters.push(makeMonsterData(i, i, 1));
+              // let monsterPath = [];
+              // for (let i = 0; i < 10; i++) monsterPath.push(makePosition(i, 0));
+              // let basePosition = makePosition(0, 0);
+              // let playerData = makeGameState(
+              //   100,
+              //   baseData,
+              //   100,
+              //   towers,
+              //   monsters,
+              //   1,
+              //   10,
+              //   monsterPath,
+              //   basePosition,
+              // );
+              // let opponentData = makeGameState(
+              //   100,
+              //   baseData,
+              //   100,
+              //   towers,
+              //   monsters,
+              //   1,
+              //   10,
+              //   monsterPath,
+              //   basePosition,
+              // );
+              // response = makeMatchStartNotification(initialGameState, playerData, opponentData);
+              // responsePacket = makePacketBuffer(
+              //   config.packetType.matchStartNotification,
+              //   userSession.getUser(socket).sequence,
+              //   response,
+              // );
+              // socket.write(responsePacket);
               break;
             case config.packetType.towerPurchaseRequest:
               proto = getProtoMessages().C2STowerPurchaseRequest;

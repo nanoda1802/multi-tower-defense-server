@@ -6,6 +6,7 @@ class UserSession {
   setUser(socket) {
     const newUser = new User(socket);
     this.users.set(socket, newUser);
+    console.log("유저생성")
     return newUser;
   }
 
