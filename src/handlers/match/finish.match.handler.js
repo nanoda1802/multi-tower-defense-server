@@ -53,8 +53,10 @@ const finishMatchHandler = (room) => {
       playerData,
       opponentData,
     );
+
     const packet = makePacketBuffer(
       config.packetType.matchStartNotification,
+      0,
       S2CMatchStartNotification,
     );
     targetPlayer.socket.write(packet);

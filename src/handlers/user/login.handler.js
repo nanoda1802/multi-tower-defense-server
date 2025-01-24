@@ -61,7 +61,7 @@ const loginHandler = async (socket, payload) => {
   // 응답 페이로드 준비
   const responsePayload = await verifyLoginInfo(userData, socket, id, password);
   // 패킷 만들어서 버퍼로 변환
-  const S2CLoginResponse = makePacketBuffer(config.packetType.loginResponse, responsePayload);
+  const S2CLoginResponse = makePacketBuffer(config.packetType.loginResponse, 0,responsePayload);
   // 클라이언트에 응답 버퍼 보냄
   socket.write(S2CLoginResponse);
 };

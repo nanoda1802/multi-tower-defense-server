@@ -18,14 +18,10 @@ class WaitingQueue {
   }
   // 유저 취소 용도
   dequeueUser(user) {
-    if (!this.queue.has(user)) {
-      this.queue.delete(user);
-    }
+    if (this.queue.has(user)) this.queue.delete(user);
   }
   // 매칭 시작
-  startMatch() {
-    console.log("큐 정보",this.queue)
-
+  startMatch = () => {
     if (this.queue.size < 2) {
       this.isMatching = false;
       return;
@@ -51,7 +47,7 @@ class WaitingQueue {
         }
       }
     }
-    setTimeout(startMatch, 1000);
+    setTimeout(this.startMatch, 1000);
   }
   //매칭 성공
   onFoundMatch(users) {

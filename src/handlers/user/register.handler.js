@@ -53,7 +53,7 @@ const registerHandler = async (socket, payload) => {
   // [2] 가입 정보 검증 후 응답 페이로드 준비
   const responsePayload = await validateRegisterInfo(id, password, email);
   // [3] 패킷 만들고 버퍼로 변환
-  const S2CRegisterResponse = makePacketBuffer(config.packetType.registerResponse, responsePayload);
+  const S2CRegisterResponse = makePacketBuffer(config.packetType.registerResponse, 0, responsePayload);
   // [4] 만든 버퍼 클라이언트에 송신
   socket.write(S2CRegisterResponse);
 };
