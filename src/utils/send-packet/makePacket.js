@@ -4,28 +4,30 @@ import config from '../../config/configs.js';
 function makePacketBuffer(packetType, sequence, payload) {
   //패킷타입 (number -> string)
   const packetTypeValues = Object.values(config.packetType);
-  const packetTypeIndex = packetTypeValues.findIndex(f => f === packetType);
+  const packetTypeIndex = packetTypeValues.findIndex((f) => f === packetType);
   const packeTypeName = Object.keys(config.packetType)[packetTypeIndex];
 
   // 페이로드
   const proto = getProtoMessages().GamePacket;
-  const message = proto.create({[packeTypeName]: payload});
+  const message = proto.create({ [packeTypeName]: payload });
   const payloadBuffer = proto.encode(message).finish();
-  
+
   // 헤더 필드값
   const version = config.env.clientVersion || '1.0.0';
   const versionLength = version.length;
   const payloadLength = payloadBuffer.length;
 
-  console.log('------------- 주는 값 -------------');
-  console.log('type:', packetType);
-  console.log('versionLength:', versionLength);
-  console.log('version:', version);
-  console.log('sequence', sequence);
-  console.log('payload', payload);
-  console.log('message', message);
-  console.log('payloadLength', payloadLength);
-  console.log('-------------------------------');
+  if (packetType === 7) {
+    console.log('------------- 주는 값 -------------');
+    console.log('type:', packetType);
+    console.log('versionLength:', versionLength);
+    console.log('version:', version);
+    console.log('sequence', sequence);
+    console.log('payload', payload);
+    console.log('message', message);
+    console.log('payloadLength', payloadLength);
+    console.log('-------------------------------');
+  }
 
   // 헤더 필드 - 패킷 타입
   const packetTypeBuffer = Buffer.alloc(2);
