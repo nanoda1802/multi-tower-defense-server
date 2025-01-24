@@ -30,56 +30,52 @@ client.connect(PORT, HOST, async () => {
   client.buffer = Buffer.alloc(0);
 
   try {
-    const registerRequestPayload = { id: 'testid', password: '1234', email: 'test@gmail.com' };
-    const loginRequestPayload = { id: 'testid', password: '1234' };
-    const matchRequestPayload = {};
-
-    // 가입 패킷 테스트
-    // sendPacketBuffer(config.packetType.registerRequest, sequence, registerRequestPayload);
-    // 로그인 패킷 테스트
-    sendPacketBuffer(config.packetType.loginRequest, sequence, loginRequestPayload);
-    // 매칭 패킷 테스트
-    // sendPacketBuffer(config.packetType.matchRequest, sequence, matchRequestPayload);
-
-    console.log('C2S 패킷 전송 완료');
+    registerRequestTest('test7', '1234', 'test@gmail.com');
+    await delay(2000);
+    loginRequestTest('test7', '1234');
+    await delay(2000);
+    matchRequestTest();
+    //sendPacketBuffer(config.packetType.matchRequest, sequence, matchRequestPayload);
   } catch (error) {
     console.log('C2S 패킷 전송 실패');
     console.error(error);
   }
 });
 
+function registerRequestTest(id, password, email){
+  const registerRequestPayload = { id, password, email };
+  sendPacketBuffer(config.packetType.registerRequest, sequence, registerRequestPayload);
+}
+
+function loginRequestTest(id, password){
+  const loginRequestPayload = { id, password };
+  sendPacketBuffer(config.packetType.loginRequest, sequence, loginRequestPayload);
+}
+
+function matchRequestTest(id, password){
+  const matchRequestPayload = { };
+  sendPacketBuffer(config.packetType.matchRequest, sequence, matchRequestPayload);
+}
+
 // 버퍼로 변환 및 송신
 function sendPacketBuffer(type, sequence, payload) {
-  let proto;
-  switch (type) {
-    case config.packetType.registerRequest:
-      proto = getProtoMessages().C2SRegisterRequest;
-      break;
-    case config.packetType.loginRequest:
-      proto = getProtoMessages().C2SLoginRequest;
-      break;
-    case config.packetType.matchRequest:
-      proto = getProtoMessages().C2SMatchRequest;
-      break;
-    default: {
-      console.log('타입에 해당하는 프로토메시지를 찾을 수 없음');
-      console.log('프로토메시지 목록');
-      console.log(Object.keys(getProtoMessages()));
-      console.log('입력된 타입:', type);
-      process.exit;
-    }
-  }
+  //패킷타입 (number -> string)
+  const packetTypeValues = Object.values(config.packetType);
+  const packetTypeIndex = packetTypeValues.findIndex(f => f === type);
+  const packeTypeName = Object.keys(config.packetType)[packetTypeIndex];
+  if(packetTypeIndex===-1) throw new Error('정의되지 않은 타입');
 
-  // 페이로드   #FIXME : type->getProto->encode
-  //const payloadBuffer = Buffer.from(payload);
-  const payloadBuffer = proto.encode(payload).finish();
+  // 페이로드
+  const proto = getProtoMessages().GamePacket;
+  const message = proto.create({[packeTypeName]: payload});
+  const payloadBuffer = proto.encode(message).finish();
 
   // 헤더 필드값
   const version = config.env.clientVersion || '1.0.0';
   const versionLength = version.length;
   const payloadLength = payloadBuffer.length;
 
-  console.log('------------- 헤더 -------------');
+  console.log('------------- 주는 값 -------------');
   console.log('type:', type);
   console.log('versionLength:', versionLength);
   console.log('version:', version);
@@ -171,12 +167,13 @@ client.on('data', (data) => {
           const payloadBuffer = client.buffer.slice(headerLength, headerLength + payloadLength);
           client.buffer = client.buffer.slice(headerLength + payloadLength);
 
-          console.log('------------- 헤더 -------------');
+          console.log('------------- 받는 값 -------------');
           console.log('type:', packetType);
           console.log('versionLength:', versionByte);
           console.log('version:', version);
-          console.log('sequence', receivedSequence);
-          console.log('payloadLength', payloadLength);
+          console.log('sequence:', receivedSequence);
+          console.log('payloadLength:', payloadLength);
+          //console.log('payload:', payload);
           console.log('-------------------------------');
 
           // S2C 패킷타입별 핸들러 실행
@@ -215,7 +212,7 @@ client.on('data', (data) => {
 });
 
 function delay(ms) {
-  new Promise((res) => setTimeout(res, ms));
+  return new Promise((res) => setTimeout(res, ms));
 }
 
 client.on('close', () => {
