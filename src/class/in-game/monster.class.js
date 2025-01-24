@@ -4,11 +4,9 @@ class Monster {
   constructor(monsterId, monsterNumber, playerId) {
     this.monsterId = monsterId;
     this.monsterNumber = monsterNumber;
-    this.stat = monsterData.find((element) => element.Rcode === 'MON0000' + monsterId);
+    this.stat = monsterData.find((element) => element.Rcode === 'MON0000' + monsterNumber);
     this.playerId = playerId;
-    this.state = 'alive'; // 'alive' 'dead' 로 표기
-    this.spawnAt = Date.now();
-    this.gold = 10;
+    this.hp = 100
   }
 
   monsterDef() {
@@ -20,7 +18,7 @@ class Monster {
   }
 
   damaged(damage) {
-    this.stat.hp -= damage
+    this.hp -= damage
   }
 }
 

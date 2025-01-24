@@ -14,20 +14,20 @@ export const spawnMonsterHandler = (socket) => { //userId로 찾기??
         // [2] 몬스터 데이터 player에 넣어주기
         player.spawnMonster(monsterId, monsterNumber); //더 필요한 정보 있으면 넣어주기 유저 둘다 넣어줘야함
         // [3]  monsterId, monsterNumber 패킷으로 감싸기 
-        let myPacket = makePacketBuffer(config.packetType.spawnMonsterResponse, 0, {monsterId, monsterNumber});
-        let enemyPacket = makePacketBuffer(config.packetType.spawnEnemyMonsterNotification, 0, {monsterId, monsterNumber});
+        // let myPacket = makePacketBuffer(config.packetType.spawnMonsterResponse, 0, {monsterId, monsterNumber});
+        // let enemyPacket = makePacketBuffer(config.packetType.spawnEnemyMonsterNotification, 0, {monsterId, monsterNumber});
         // [4] packet 보내주기
-        player.socket.write(myPacket);
-        player.socket.write(enemyPacket);
+        // player.socket.write(myPacket);
+        // player.socket.write(enemyPacket);
 
-        // room.players.forEach((player) => {
-        //   let packet
-        //   if (player.id === user.id)
-        //     packet = makePacketBuffer(config.packetType.spawnMonsterResponse, 0, {monsterId, monsterNumber});
-        //   else 
-        //     packet = makePacketBuffer(config.packetType.spawnEnemyMonsterNotification, 0, { monsterId, monsterNumber });
-        //   player.socket.write(packet)
-        // })
+        room.players.forEach((player) => {
+          let packet
+          if (player.id === user.id)
+            packet = makePacketBuffer(config.packetType.spawnMonsterResponse, 0, {monsterId, monsterNumber});
+          else 
+            packet = makePacketBuffer(config.packetType.spawnEnemyMonsterNotification, 0, { monsterId, monsterNumber });
+          player.socket.write(packet)
+        })
 }
 
 //setMonster(monsterId, monsterNumber) =>player1, 2모두에게 들어가야함

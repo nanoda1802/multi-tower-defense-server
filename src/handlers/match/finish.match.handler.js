@@ -17,7 +17,7 @@ const finishMatchHandler = (room) => {
   //길만들기 // 객체 형태로 관리해 달라고 요청 하기.
 
   for (let targetPlayer of room.players.values()) {
-    const monsterPath = makePath(2);
+    const monsterPath = makePath(4);
     //타겟인 플레이어 데이터
     //플레이어 쪽에서 score어랑 highscore 관리 해주기 요청
     const playerData = makeGameState(

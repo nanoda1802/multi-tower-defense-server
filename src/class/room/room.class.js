@@ -7,8 +7,8 @@ class Room {
 
     // 변수들 입니다.
     this.roomLevel = 0;
-    this.monsterId = 0;
-    this.towerId = 0;
+    this.monsterId = 1;
+    this.towerId = 1;
 
     this.players = new Map();
     this.setPlayers(users);

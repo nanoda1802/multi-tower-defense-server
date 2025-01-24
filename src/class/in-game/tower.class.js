@@ -12,16 +12,16 @@ class Tower {
   }
 
   attackMonster(monster) {
-    const timeDiff = Date.now() - this.lastUpdate;
+    // const timeDiff = Date.now() - this.lastUpdate;
     // 공격 쿨타임 확인
-    if (timeDiff < this.stat.coolDown) return false
+    // if (timeDiff < this.stat.coolDown) return false
     // 위치 정보 확인
-    const distance = Math.floor(Math.sqrt((this.x - targetX)** 2 + (this.y - targetY)** 2))
-    if (distance > this.stat.range) return false
+    // const distance = Math.floor(Math.sqrt((this.x - monster.x) ** 2 + (this.y - monster.y)** 2))
+    // if (distance > this.stat.range) return false
 
     // 몬스터 공격 적용
     monster.damaged(this.getDamage())
-    this.lastUpdate = Date.now();
+    // this.lastUpdate = Date.now();
     return true
   }
 
