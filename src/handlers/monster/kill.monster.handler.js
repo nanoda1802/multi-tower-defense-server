@@ -10,6 +10,9 @@ export const killMonsterHandler = (socket, payload) => {
   const room = roomSession.getRoom(user.roomId);
   const player = room.getPlayer(user.id);
   // [3] 몬스터 사망 처리
+  if (!player.getMonster(monsterId)) {
+    return;
+  }
   player.killMonster(monsterId);
   // [4] 상대방 클라이언트에 정보 보내기
   room.players.forEach((player) => {

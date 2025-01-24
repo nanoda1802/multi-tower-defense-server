@@ -30,13 +30,15 @@ class Room {
   }
 
   getMonsterId() {
-    if ( this.monsterId % 10 === 0 ) {
-      this.monsterLevel++
-      this.players.forEach((player) => player.towers.forEach((tower) => tower.levelUp(this.monsterLevel)));
+    if (this.monsterId % 10 === 0) {
+      this.monsterLevel++;
+      this.players.forEach((player) =>
+        player.towers.forEach((tower) => tower.setLevel(this.monsterLevel)),
+      );
     }
     return this.monsterId++;
   }
-  
+
   getTowerId() {
     return this.towerId++;
   }

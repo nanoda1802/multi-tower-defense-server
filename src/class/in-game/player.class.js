@@ -66,7 +66,7 @@ class Player {
     });
     // [3] 본인 몬스터 데이터 프로토 정의에 맞게 변환
     const monsterData = [...this.monsters.values()].map((monster) => {
-      return makeMonsterData(monster.monsterId, monster.monsterNumber);
+      return makeMonsterData(monster.monsterId, monster.monsterNumber, monsterLevel);
     });
     // [4] 상태동기화 페이로드 역시 프로토 정의에 맞게 변환해 반환
     return makeStateSyncNotification(

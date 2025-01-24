@@ -7,13 +7,11 @@ class RoomSession {
 
   addRoom(users) {
     const roomId = uuidv4();
-    this.rooms[roomId] = new Room(roomId, users);
+    this.rooms.set(roomId, new Room(roomId, users));
   }
 
   getRoom(roomId) {
-    if (this.rooms[roomId] !== undefined) {
-      return this.rooms[roomId];
-    }
+    return this.rooms.get(roomId);
   }
 
   getAllRoom() {
