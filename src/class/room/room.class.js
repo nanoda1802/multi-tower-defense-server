@@ -5,21 +5,18 @@ class Room {
     this.id = id;
 
     // 변수들 입니다.
-    this.roomLevel = 0;
+    this.monsterLevel = 1;
     this.monsterId = 1;
     this.towerId = 1;
 
-    this.users = new Map();
     this.players = new Map();
     this.setPlayers(users);
   }
-
   // 플레이어 관련
   setPlayers(users) {
     for (let user of users) {
-      this.users.set(user.id, user);
       user.enterRoom(this.id);
-      this.players.set(user.id, new Player(user.id, user.socket, this.id));
+      this.players.set(user.id, new Player(user.id, user.socket, this.id, user));
     }
     finishMatchHandler(this);
   }
@@ -33,16 +30,28 @@ class Room {
   }
 
   getMonsterId() {
-    return this.monsterId++;
+    const id = this.monsterId++;
+    if (id % 10 === 0) {
+      this.monsterLevel++;
+    }
+    return id;
   }
 
   getTowerId() {
     return this.towerId++;
   }
 
-  broadcast(packet) {
+  broadcastOthers(packetType, payload, id) {
     this.users.forEach((user) => {
-      user.send.write(packet);
+      if (user.id !== id) {
+        user.sendPacket(packetType, payload);
+      }
+    });
+  }
+
+  broadcast(packetType, payload) {
+    this.users.forEach((user) => {
+      user.sendPacket(packetType, payload);
     });
   }
 }
