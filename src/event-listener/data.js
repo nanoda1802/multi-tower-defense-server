@@ -1,22 +1,6 @@
 import config from '../config/configs.js';
 import { getProtoMessages } from '../init/load.proto.js';
-import {
-  makeLoginResponse,
-  makeRegisterResponse,
-  makeSpawnMonsterResponse,
-  makeTowerPurchaseResponse,
-} from '../utils/send-packet/payload/response/game.response.js';
-import makePacketBuffer from '../utils/send-packet/makePacket.js';
 import { userSession } from '../session/session.js';
-import { makeMatchStartNotification } from '../utils/send-packet/payload/notification/game.notification.js';
-import {
-  makeBaseData,
-  makeGameState,
-  makeInitialGameState,
-  makeMonsterData,
-  makePosition,
-  makeTowerData,
-} from '../utils/send-packet/payload/game.data.js';
 import loginHandler from '../handlers/user/login.handler.js';
 import registerHandler from '../handlers/user/register.handler.js';
 import addMatchHandler from '../handlers/match/add.match.handler.js';
@@ -27,14 +11,6 @@ import attackBaseHandler from '../handlers/monster/attack.base.handler.js';
 import { killMonsterHandler } from '../handlers/monster/kill.monster.handler.js';
 
 export const onData = (socket) => async (data) => {
-  // // | **필드 명** | **타입** | **설명** |
-  // // | --- | --- | --- |
-  // // | packetType | ushort | 패킷 타입 (2바이트) |
-  // // | versionLength | ubyte | 버전 길이 (1바이트) |
-  // // | version | string | 버전 (문자열) |
-  // // | sequence | uint32 | 패킷 번호 (4바이트) |
-  // // | payloadLength | uint32 | 데이터 길이 (4바이트) |
-  // // | payload | bytes | 실제 데이터 |
   try {
     socket.buffer = Buffer.concat([socket.buffer, data]);
 
@@ -91,9 +67,7 @@ export const onData = (socket) => async (data) => {
           console.log('payload', payload);
           console.log('-------------------------------');
 
-          // C2S 패킷타입별 핸들러 실행
-          let response = null;
-          let responsePacket = null;
+          // 패킷타입별 핸들러 실행
           switch (packetType) {
             case config.packetType.registerRequest:
               registerHandler(socket, payload);
@@ -106,23 +80,9 @@ export const onData = (socket) => async (data) => {
               break;
             case config.packetType.towerPurchaseRequest:
               purchaseTowerHandler(socket, payload)
-              // response = makeTowerPurchaseResponse(1);
-              // responsePacket = makePacketBuffer(
-              //   config.packetType.towerPurchaseResponse,
-              //   userSession.getUser(socket).sequence,
-              //   response,
-              // );
-              // socket.write(responsePacket);
               break;
             case config.packetType.spawnMonsterRequest:
               spawnMonsterHandler(socket)
-              // response = makeSpawnMonsterResponse(1, 1);
-              // responsePacket = makePacketBuffer(
-              //   config.packetType.spawnMonsterResponse,
-              //   userSession.getUser(socket).sequence,
-              //   response,
-              // );
-              // socket.write(responsePacket);
               break;
             case config.packetType.towerAttackRequest:
               attackMonsterHandler(socket,payload)
