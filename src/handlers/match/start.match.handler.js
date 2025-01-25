@@ -9,7 +9,7 @@ import {
 } from '../../utils/send-packet/payload/game.data.js';
 import { makeMatchStartNotification } from '../../utils/send-packet/payload/notification/game.notification.js';
 
-const finishMatchHandler = (room) => {
+const startMatchHandler = (room) => {
   let monsterPath = {};
   let playerData = {};
   const playerId = [];
@@ -23,35 +23,35 @@ const finishMatchHandler = (room) => {
 
   //길만들기 // 객체 형태로 관리해 달라고 요청 하기.
   room.players.forEach((player) => {
-    monsterPath[player.id] = makePath(5);
-    playerData[player.id] = makeGameState(
+    monsterPath[player.user.id] = makePath(5);
+    playerData[player.user.id] = makeGameState(
       player.gold,
       makeBaseData(player.base.hp, player.base.maxHp),
-      player.highScore,
+      player.user.highScore,
       [],
       [],
       room.monsterLevel,
       player.score,
-      monsterPath[player.id],
-      monsterPath[player.id][monsterPath[player.id].length - 1],
+      monsterPath[player.user.id],
+      monsterPath[player.user.id][monsterPath[player.user.id].length - 1],
     );
-    playerId.push(player.id);
+    playerId.push(player.user.id);
   });
 
   // 전달
   room.players.forEach((player) => {
     const S2CMatchStartNotification = makeMatchStartNotification(
       initialGameState,
-      playerData[player.id],
-      playerData[playerId.find((e) => e !== player.id)],
+      playerData[player.user.id],
+      playerData[playerId.find((e) => e !== player.user.id)],
     );
     const packet = makePacketBuffer(
       config.packetType.matchStartNotification,
-      userSession.getUser(player.socket).sequence,
+      userSession.getUser(player.user.socket).sequence,
       S2CMatchStartNotification,
     );
-    player.socket.write(packet);
+    player.user.socket.write(packet);
   });
 };
 
-export default finishMatchHandler;
+export default startMatchHandler;
