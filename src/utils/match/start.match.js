@@ -1,15 +1,15 @@
 import config from '../../config/configs.js';
 import { userSession } from '../../session/session.js';
-import makePath from '../../utils/path/make.monster.path.js';
-import makePacketBuffer from '../../utils/send-packet/makePacket.js';
+import makePath from '../path/make.monster.path.js';
+import makePacketBuffer from '../send-packet/makePacket.js';
 import {
   makeBaseData,
   makeGameState,
   makeInitialGameState,
-} from '../../utils/send-packet/payload/game.data.js';
-import { makeMatchStartNotification } from '../../utils/send-packet/payload/notification/game.notification.js';
+} from '../send-packet/payload/game.data.js';
+import { makeMatchStartNotification } from '../send-packet/payload/notification/game.notification.js';
 
-const startMatchHandler = (room) => {
+const startMatch = (room) => {
   let monsterPath = {};
   let playerData = {};
   const playerId = [];
@@ -54,4 +54,4 @@ const startMatchHandler = (room) => {
   });
 };
 
-export default startMatchHandler;
+export default startMatch;

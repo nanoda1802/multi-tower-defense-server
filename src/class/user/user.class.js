@@ -11,22 +11,22 @@ class User {
     this.socket = socket;
     this.state = userState.waiting; // "waiting", "matchMaking", "playing"
 
-    this.highScore = null;
     this.matchRecord = {
       win: null,
       lose: null,
     };
     this.mmr = null;
+    this.highScore = null;
     this.sequence = 1;
   }
 
-  login(key, userId, highScore, winCount, loseCount, mmr) {
+  login(key, userId, winCount, loseCount, mmr, highScore) {
     this.key = key;
     this.id = userId;
-    this.highScore = highScore;
     this.matchRecord.win = winCount;
     this.matchRecord.lose = loseCount;
     this.mmr = mmr;
+    this.highScore = highScore;
   }
 
   enterRoom(roomId) {
@@ -43,7 +43,7 @@ class User {
   }
 
   /* 경기 결과 최신화시키기 */
-  updateMatchRecord(isWin) {
+  updateMatchRecord(isWin, scoreResult) {
     // [1] 경기 종료됐으니 유저 상태 "대기"로 변경
     this.state = userState.waiting;
     // [2] 이겼으면 승수 + 1, 졌으면 패수 + 1
@@ -52,10 +52,9 @@ class User {
     } else {
       this.matchRecord.lose += 1;
     }
-    console.log(`!!! 승수 : ${this.matchRecord.win} / 패수 : ${this.matchRecord.lose} !!!`);
+    // [3] 획득 점수가 최고 기록 보다 높다면 최신화
+    if (scoreResult > this.highScore) this.highScore = scoreResult;
   }
-
-  calculateMmr() {}
 
   getSequence() {
     return this.sequence++;

@@ -1,6 +1,7 @@
 import config from '../../config/configs.js';
 import makePacketBuffer from '../../utils/send-packet/makePacket.js';
 import { roomSession, userSession } from '../../session/session.js';
+import finishMatch from '../../utils/match/finish.match.js';
 
 const attackBaseHandler = (socket, payload) => {
   // 세션<>입력 검증 과정
@@ -17,23 +18,8 @@ const attackBaseHandler = (socket, payload) => {
   // base 체력으로 게임오버 여부 확인
   const baseHp = player.base.getHp();
   if (baseHp <= 0) {
-    /* 게임오버 판정하기 */
-    // [1] 승패 판정 후 전적 최신화
-    const matchResult = { winner: '', loser: '' };
-    room.players.forEach((player, playerId) => {
-      // [1-1] 승패 판정 (베이스가 주근 player가 본인이라면 패배)
-      const isWin = playerId === user.id ? false : true;
-      if (isWin) matchResult.winner = playerId;
-      else matchResult.loser = playerId;
-      // [1-2] gameOverNotification 패킷 만들어 전송
-      player.user.sendPacket(config.packetType.gameOverNotification, { isWin });
-      // [1-3] 전적 최신화
-      player.user.updateMatchRecord(isWin);
-    });
-    // [2] 각 유저 mmr 최신화
-    room.updateMmr(matchResult);
-    // [3] 룸 세션에서 매치 종료된 룸 제거
-    roomSession.deleteRoom(room.id);
+    finishMatch(room, user); // end 이벤트에서 중복 사용되는 관계로 모듈로 뺌
+
     /* 밑은 기존 코드 */
     // 게임 오버 시 종료 시점을 클라이언트들에게 전달
     // room.players.forEach((player) => {

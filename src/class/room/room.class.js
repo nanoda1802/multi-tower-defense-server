@@ -1,4 +1,4 @@
-import startMatchHandler from '../../handlers/match/start.match.handler.js';
+import startMatch from '../../utils/match/start.match.js';
 import Player from '../in-game/player.class.js';
 import EloRank from 'elo-rank';
 
@@ -30,13 +30,23 @@ class Room {
     this.players.set(userA.id, new Player(userA, userB.id));
     this.players.set(userB.id, new Player(userB, userA.id));
     // [3] 매치 시작 핸들러 실행
-    startMatchHandler(this);
+    startMatch(this);
     /* 밑은 기존 코드 */
     // for (let user of users) {
     //   user.enterRoom(this.id);
     //   this.players.set(user.id, new Player(user.id, user.socket, this.id, user));
     // }
     // finishMatchHandler(this);
+  }
+
+  /* 룸 비우기 */
+  clearRoom() {
+    // [1] 소속 유저들 roomId 초기화
+    for (const player of this.players.values()) {
+      player.user.roomId = null;
+    }
+    // [2] Map 인스턴스 초기화
+    this.players.clear();
   }
 
   getUser(id) {
@@ -74,7 +84,6 @@ class Room {
     // [3] 예상 승리 확률과 실제 승패를 바탕으로 각각의 mmr 최신화
     winner.mmr = elo.updateRating(winProbability.winner, 1, winner.mmr); // 1은 실제로 승리했다는 의미
     loser.mmr = elo.updateRating(winProbability.loser, 0, loser.mmr); // 0은 실제로 패배했다는 의미, 참고로 0.5는 비겼다는 의미
-    console.log(`!!! 승자 : ${winner.mmr} / 패자 : ${loser.mmr} !!!`);
   }
 
   broadcastOthers(packetType, payload, id) {
