@@ -42,11 +42,17 @@ class User {
     this.state = userState.gamePlaying;
   }
 
-  // 플레이어에서 해야하나? 무튼
-  finishGame() {
+  /* 경기 결과 최신화시키기 */
+  updateMatchRecord(isWin) {
+    // [1] 경기 종료됐으니 유저 상태 "대기"로 변경
     this.state = userState.waiting;
-    // matchRecord 최신화
-    // mmr 계산해 최신화
+    // [2] 이겼으면 승수 + 1, 졌으면 패수 + 1
+    if (isWin) {
+      this.matchRecord.win += 1;
+    } else {
+      this.matchRecord.lose += 1;
+    }
+    console.log(`!!! 승수 : ${this.matchRecord.win} / 패수 : ${this.matchRecord.lose} !!!`);
   }
 
   calculateMmr() {}

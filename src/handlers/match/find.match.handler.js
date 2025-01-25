@@ -1,6 +1,6 @@
 import { userSession, waitingQueue } from '../../session/session.js';
 
-const addMatchHandler = (socket, payload) => {
+const findMatchHandler = (socket, payload) => {
   const user = userSession.getUser(socket);
   if (user !== undefined) {
     console.log("매칭에 집어넣음")
@@ -9,4 +9,4 @@ const addMatchHandler = (socket, payload) => {
   }
 };
 
-export default addMatchHandler;
+export default findMatchHandler;

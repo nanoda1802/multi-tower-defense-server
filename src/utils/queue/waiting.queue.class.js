@@ -13,7 +13,7 @@ class WaitingQueue {
       this.queue.add(user);
     }
     if (this.queue.size > 1 && !this.isMatching) {
-      this.startMatch();
+      this.startMatchMaking();
     }
   }
   // 유저 취소 용도
@@ -21,7 +21,7 @@ class WaitingQueue {
     if (this.queue.has(user)) this.queue.delete(user);
   }
   // 매칭 시작
-  startMatch = () => {
+  startMatchMaking = () => {
     if (this.queue.size < 2) {
       this.isMatching = false;
       return;
@@ -47,7 +47,7 @@ class WaitingQueue {
         }
       }
     }
-    setTimeout(this.startMatch, 1000);
+    setTimeout(this.startMatchMaking, 1000);
   }
   //매칭 성공
   onFoundMatch(users) {

@@ -17,7 +17,7 @@ export const killMonsterHandler = (socket, payload) => {
   // [4] 상대방 클라이언트에 정보 보내기
   room.players.forEach((player) => {
     let packet;
-    if (player.id === user.id) {
+    if (player.user.id === user.id) {
       packet = makePacketBuffer(
         config.packetType.stateSyncNotification,
         0,
@@ -28,7 +28,7 @@ export const killMonsterHandler = (socket, payload) => {
         monsterId,
       });
     }
-    player.socket.write(packet);
+    player.user.socket.write(packet);
   });
 };
 

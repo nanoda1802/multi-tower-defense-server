@@ -11,13 +11,9 @@ const { game } = config;
 
 class Player {
   /* 베이스, 몬스터, 타워에 필요한 매개변수 말씀해주시면 추가하기 */
-  constructor(userId, socket, roomId) {
-    this.id = userId;
-    this.socket = socket; // 아니면 User 인스턴스를 통째로....? sequence 때문에 고민
-    this.roomId = roomId;
-    this.opponentId = null; // 일단 기존 기획대로
-    // 이부분 생성자에서 나중에 추가 예정
-    this.highScore = 0;
+  constructor(user, opponentId) {
+    this.user = user;
+    this.opponentId = opponentId;
     this.score = 0;
     this.gold = game.initialGold;
     this.base = new Base(game.baseHp);
@@ -33,7 +29,7 @@ class Player {
       const towerId = room.getTowerId();
       this.gold -= game.towerCost;
       // 현재 클라이언트에서 생성되는 타워는 TOW00001이 유일하기에 고정
-      this.towers.set(towerId, new Tower(towerId, x, y, 'TOW00001', this.id));
+      this.towers.set(towerId, new Tower(towerId, x, y, 'TOW00001', this.user.id));
       return towerId;
     }
   }
@@ -43,7 +39,7 @@ class Player {
   }
 
   spawnMonster(monsterId, monsterNumber, level) {
-    this.monsters.set(monsterId, new Monster(monsterId, monsterNumber, this.id, level));
+    this.monsters.set(monsterId, new Monster(monsterId, monsterNumber, this.user.id, level));
   }
 
   killMonster(monsterId) {
@@ -59,7 +55,7 @@ class Player {
   /* 상태 동기화 페이로드 만들기 */
   makeSyncPayload() {
     // [1] 소속 룸에서 현 몬스터레벨 가져옴
-    const monsterLevel = roomSession.getRoom(this.roomId).monsterLevel;
+    const monsterLevel = roomSession.getRoom(this.user.roomId).monsterLevel;
     // [2] 본인 타워 데이터 프로토 정의에 맞게 변환
     const towerData = [...this.towers.values()].map((tower) => {
       return makeTowerData(tower.towerId, tower.x, tower.y);
@@ -78,6 +74,8 @@ class Player {
       monsterData,
     );
   }
+
+  
 }
 
 export default Player;

@@ -3,7 +3,7 @@ import { getProtoMessages } from '../init/load.proto.js';
 import { userSession } from '../session/session.js';
 import loginHandler from '../handlers/user/login.handler.js';
 import registerHandler from '../handlers/user/register.handler.js';
-import addMatchHandler from '../handlers/match/add.match.handler.js';
+import findMatchHandler from '../handlers/match/find.match.handler.js';
 import purchaseTowerHandler from '../handlers/tower/purchase.tower.handler.js';
 import { spawnMonsterHandler } from '../handlers/monster/spawn.monster.handler.js';
 import attackMonsterHandler from '../handlers/tower/attack.monster.handler.js';
@@ -76,25 +76,25 @@ export const onData = (socket) => async (data) => {
               loginHandler(socket, payload);
               break;
             case config.packetType.matchRequest:
-              addMatchHandler(socket, payload)
+              findMatchHandler(socket, payload);
               break;
             case config.packetType.towerPurchaseRequest:
-              purchaseTowerHandler(socket, payload)
+              purchaseTowerHandler(socket, payload);
               break;
             case config.packetType.spawnMonsterRequest:
-              spawnMonsterHandler(socket)
+              spawnMonsterHandler(socket);
               break;
             case config.packetType.towerAttackRequest:
-              attackMonsterHandler(socket,payload)
+              attackMonsterHandler(socket, payload);
               break;
             case config.packetType.monsterAttackBaseRequest:
-              attackBaseHandler(socket, payload)
+              attackBaseHandler(socket, payload);
               break;
             case config.packetType.gameEndRequest:
               // handler(socket, payload)
               break;
             case config.packetType.monsterDeathNotification:
-              killMonsterHandler(socket, payload)
+              killMonsterHandler(socket, payload);
               break;
             default:
               console.log('정의되지 않은 패킷 타입 : ', packetType);

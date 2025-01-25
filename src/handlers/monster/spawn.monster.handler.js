@@ -18,12 +18,12 @@ export const spawnMonsterHandler = (socket) => {
   // let myPacket = makePacketBuffer(config.packetType.spawnMonsterResponse, 0, {monsterId, monsterNumber});
   // let enemyPacket = makePacketBuffer(config.packetType.spawnEnemyMonsterNotification, 0, {monsterId, monsterNumber});
   // [4] packet 보내주기
-  // player.socket.write(myPacket);
-  // player.socket.write(enemyPacket);
+  // player.user.socket.write(myPacket);
+  // player.user.socket.write(enemyPacket);
 
   room.players.forEach((player) => {
     let packet;
-    if (player.id === user.id)
+    if (player.user.id === user.id)
       packet = makePacketBuffer(config.packetType.spawnMonsterResponse, 0, {
         monsterId,
         monsterNumber,
@@ -33,7 +33,7 @@ export const spawnMonsterHandler = (socket) => {
         monsterId,
         monsterNumber,
       });
-    player.socket.write(packet);
+    player.user.socket.write(packet);
   });
 };
 

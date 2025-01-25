@@ -21,12 +21,12 @@ const attackMonsterHandler = (socket, payload) => {
   if (tower.attackMonster(monster))
     room.players.forEach((player) => {
       // 자신을 제외한 상대에게 티워 공격 정보 반환
-      if (player.id === user.id) return;
+      if (player.user.id === user.id) return;
       const packet = makePacketBuffer(config.packetType.enemyTowerAttackNotification, 0, {
         towerId,
         monsterId,
       });
-      player.socket.write(packet);
+      player.user.socket.write(packet);
     });
 };
 
