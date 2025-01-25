@@ -59,10 +59,10 @@ const verifyLoginInfo = async (user, id, password) => {
   user.login(
     userData.user_key,
     userData.id,
-    userData.high_score,
     userData.win_count,
     userData.lose_count,
     userData.mmr,
+    userData.high_score,
   );
   // [7] 성공 응답 페이로드 반환
   return { success: true, message: messageType.success, token, failCode: GlobalFailCode.NONE };
