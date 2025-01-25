@@ -7,16 +7,15 @@ const createPool = (envConfig) => {
     user: envConfig.db1User,
     password: envConfig.db1Password,
     database: envConfig.db1Name,
-    waitForConnections: true, //모자르면 기다린다!
+    waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 10, //얼마나 대기시켜줄지
+    queueLimit: 0,
   });
 
-  const originalQuery = pool.query;
+  const originalQuery = pool.execute;
 
-  pool.query = (sql, params) => {
+  pool.execute = (sql, params) => {
     const date = new Date();
-    // 쿼리 실행시 로그
     console.log(`${date}에 실행된 쿼리 : ${sql}`);
     console.log(`쿼리의 매개변수 : ${params ? `${JSON.stringify(params)}` : `none`}`);
     return originalQuery.call(pool, sql, params);
