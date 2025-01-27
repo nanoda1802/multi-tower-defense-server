@@ -37,17 +37,17 @@ export const onData = (socket) => async (data) => {
           packetTypeByte + versionLengthByte + versionByte,
         );
         let expectedSequence = userSession.getUser(socket).getSequence();
-        if (sequence === expectedSequence) {
-          console.log('시퀀스 검증 통과');
-        } else {
-          console.log(`시퀀스 에러. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${sequence}`);
+        if (sequence !== expectedSequence) {
+          console.log(`시퀀스 검증 실패. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${sequence}`);
+          const invalidSeqUser = userSession.getUser(socket);
           // 룸 상대방 승패 결정
-          
-          // 룸 세션 정리
-          
-          // 유저 세션 정리
+          const invalidSeqRoom = roomSession.getRoom(invalidSeqUser.roomId);
+          roomSession.finishMatch(invalidSeqRoom, invalidSeqUser);
+          // 룸 세션 삭제
+          roomSession.deleteRoom(invalidSeqRoom.id);
+          // 유저 세션 삭제
           userSession.deleteUser(socket);
-          // 소켓 정리
+          // 소켓 연결 해제
           socket.end();
           return;
         }
