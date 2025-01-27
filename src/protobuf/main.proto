@@ -54,7 +54,6 @@ message GameState {
   Position basePosition = 9;
 }
 
-
 /* 
   패킷 명세
 */

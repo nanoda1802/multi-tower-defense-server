@@ -11,6 +11,7 @@ class WaitingQueue {
   addQueue(user) {
     if (!this.queue.has(user)) {
       this.queue.add(user);
+      user.matchMaking();
     }
     if (this.queue.size > 1 && !this.isMatching) {
       this.startMatchMaking();
@@ -20,6 +21,7 @@ class WaitingQueue {
   dequeueUser(user) {
     if (this.queue.has(user)) this.queue.delete(user);
   }
+
   // 매칭 시작
   startMatchMaking = () => {
     if (this.queue.size < 2) {
@@ -48,7 +50,7 @@ class WaitingQueue {
       }
     }
     setTimeout(this.startMatchMaking, 1000);
-  }
+  };
   //매칭 성공
   onFoundMatch(users) {
     for (let user of users) {

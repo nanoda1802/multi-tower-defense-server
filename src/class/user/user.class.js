@@ -33,26 +33,23 @@ class User {
     this.roomId = roomId;
   }
 
-  // 룸에서 하나...? 무튼
-  matchMake() {
+  matchMaking() {
     this.state = userState.matchMaking;
   }
 
-  startGame() {
-    this.state = userState.gamePlaying;
+  playing() {
+    this.state = userState.playing;
   }
 
   /* 경기 결과 최신화시키기 */
   updateMatchRecord(isWin, scoreResult) {
-    // [1] 경기 종료됐으니 유저 상태 "대기"로 변경
-    this.state = userState.waiting;
-    // [2] 이겼으면 승수 + 1, 졌으면 패수 + 1
+    // [1] 이겼으면 승수 + 1, 졌으면 패수 + 1
     if (isWin) {
       this.matchRecord.win += 1;
     } else {
       this.matchRecord.lose += 1;
     }
-    // [3] 획득 점수가 최고 기록 보다 높다면 최신화
+    // [2] 획득 점수가 최고 기록 보다 높다면 최신화
     if (scoreResult > this.highScore) this.highScore = scoreResult;
   }
 
