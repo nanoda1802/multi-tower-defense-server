@@ -76,38 +76,26 @@ class User {
     const versionLength = version.length;
     const payloadLength = payloadBuffer.length;
 
-    if (true) {
-      // 콘솔로그 필터링하려면 조건 입력
-      console.log('------------- 주는 값 -------------');
-      console.log(`type: ${packetType}.${packetTypeName}`);
-      console.log('versionLength:', versionLength);
-      console.log('version:', version);
-      console.log('sequence:', this.sequence);
-      console.log('payloadLength:', payloadLength);
-      console.log('payload:', message);
-      console.log('-------------------------------');
-    }
-
-    // 헤더 필드 - 패킷 타입
+    // 헤더 쓰기 - 패킷 타입
     const packetTypeBuffer = Buffer.alloc(2);
     packetTypeBuffer.writeUint16BE(packetType, 0);
 
-    // 헤더 필드 - 버전 길이
+    // 헤더 쓰기 - 버전 길이
     const versionLengthBuffer = Buffer.alloc(1);
     versionLengthBuffer.writeUInt8(versionLength, 0);
 
-    // 헤더 필드 - 버전
+    // 헤더 쓰기 - 버전
     const versionBuffer = Buffer.from(version);
 
-    // 헤더 필드 - 시퀀스
+    // 헤더 쓰기 - 시퀀스
     const sequenceBuffer = Buffer.alloc(4);
     sequenceBuffer.writeUint32BE(this.sequence, 0);
 
-    // 헤더 필드 - 페이로드 길이
+    // 헤더 쓰기 - 페이로드 길이
     const payloadLengthBuffer = Buffer.alloc(4);
     payloadLengthBuffer.writeUInt32BE(payloadLength, 0);
 
-    // 헤더
+    // 헤더 만들기
     const headerBuffer = Buffer.concat([
       packetTypeBuffer,
       versionLengthBuffer,
@@ -116,9 +104,15 @@ class User {
       payloadLengthBuffer,
     ]);
 
-    // 패킷
+    // 디버깅
+    if (packetType === 7) {
+      printHeader(packetType, versionLength, version, sequence, payloadLength, 'out');
+      console.log('payload', message);
+    }
+
+    // 패킷 만들기
     const packetBuffer = Buffer.concat([headerBuffer, payloadBuffer]);
-    // 메서드 합치다가 여기 그냥 packet이여서 오류 남!! packetBuffer로 변경
+
     this.socket.write(packetBuffer);
   }
 }

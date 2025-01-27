@@ -1,6 +1,6 @@
 import config from '../config/configs.js';
 import { getProtoMessages } from '../init/load.proto.js';
-import { userSession } from '../session/session.js';
+import { roomSession, userSession } from '../session/session.js';
 import loginHandler from '../handlers/user/login.handler.js';
 import registerHandler from '../handlers/user/register.handler.js';
 import findMatchHandler from '../handlers/match/find.match.handler.js';
@@ -9,6 +9,7 @@ import { spawnMonsterHandler } from '../handlers/monster/spawn.monster.handler.j
 import attackMonsterHandler from '../handlers/tower/attack.monster.handler.js';
 import attackBaseHandler from '../handlers/monster/attack.base.handler.js';
 import { killMonsterHandler } from '../handlers/monster/kill.monster.handler.js';
+import { printHeader } from '../utils/send-packet/printHeader.js';
 
 export const onData = (socket) => async (data) => {
   try {
@@ -40,7 +41,15 @@ export const onData = (socket) => async (data) => {
           console.log('시퀀스 검증 통과');
         } else {
           console.log(`시퀀스 에러. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${sequence}`);
-          return; // 기대 시퀀스가 올 때까지 패킷 무시
+          // 룸 상대방 승패 결정
+          
+          // 룸 세션 정리
+          
+          // 유저 세션 정리
+          userSession.deleteUser(socket);
+          // 소켓 정리
+          socket.end();
+          return;
         }
 
         const headerLength =
@@ -58,14 +67,11 @@ export const onData = (socket) => async (data) => {
           const gamePacket = proto.decode(payloadBuffer);
           const payload = gamePacket[gamePacket.payload];
 
-          console.log('------------- 받는 값 -------------');
-          console.log('type:', packetType);
-          console.log('versionLength:', versionByte);
-          console.log('version:', version);
-          console.log('sequence', sequence);
-          console.log('payloadLength', payloadLength);
-          console.log('payload', payload);
-          console.log('-------------------------------');
+          // 디버깅
+          if (packetType === 7) {
+            printHeader(packetType, versionByte, version, sequence, payloadLength, 'in');
+            console.log('payload :', payload);
+          }
 
           // 패킷타입별 핸들러 실행
           switch (packetType) {

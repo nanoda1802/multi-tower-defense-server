@@ -85,8 +85,24 @@ class Client {
               case config.packetType.matchStartNotification:
                 console.log(this.id, '매칭 성공');
                 break;
-              case config.packetType.matchStartNotification:
-                //console.log('서버로부터 응답', JSON.stringify(payload, null, 2));
+              case config.packetType.stateSyncNotification:
+                console.log(this.id, '상태동기화');
+                break;
+              case config.packetType.towerPurchaseResponse:
+                console.log(this.id, '구매타워id:', payload.towerId);
+                break;
+              case config.packetType.addEnemyTowerNotification:
+                console.log(this.id, '적 구매타워id:', payload.towerId);
+                break;
+              case config.packetType.spawnMonsterResponse:
+                console.log(this.id, '몬스터 소환');
+                if(!payload.monsterId || !payload.monsterNumber);
+                  throw new Error('몬스터소환 알림 수신 에러');
+                break;
+              case config.packetType.spawnEnemyMonsterNotification:
+                console.log(this.id, '적몬스터 소환');
+                if(!payload.monsterId || !payload.monsterNumber);
+                  throw new Error('적몬스터소환 알림 수신 에러');
                 break;
               default:
                 console.log('핸들러가 등록되지 않은 패킷 타입 : ', packetType);
@@ -118,6 +134,11 @@ class Client {
   matchRequestTest() {
     const matchRequestPayload = {};
     this.sendPacket(config.packetType.matchRequest, matchRequestPayload);
+  }
+  
+  spawnMonsterRequestRequestTest() {
+    const spawnMonsterRequestPayload = {};
+    this.sendPacket(config.packetType.spawnMonsterRequest, spawnMonsterRequestPayload);
   }
 
   // 버퍼로 변환 및 송신
@@ -182,8 +203,9 @@ class Client {
     console.log('Connection closed');
   }
 
-  onError() {
+  onError(err) {
     console.error('Client error:', err);
+    throw new Error(err);
   }
 }
 
@@ -191,27 +213,30 @@ class Client {
 await loadProtos().then(matchTest);
 
 async function matchTest() {
-  for (let i = 1; i <= 10; i+=2) {
+  let client1, client2;
+  for (let i = 1; i <= 10; i += 2) {
     const id1 = 'test' + i;
-    const id2 = 'test' + (i+1);
+    const id2 = 'test' + (i + 1);
     const password = '1234';
-    const client1 = new Client(id1, password);
-    const client2 = new Client(id2, password);
+    client1 = new Client(id1, password);
+    client2 = new Client(id2, password);
+    await delay(10);
     client1.loginRequestTest();
     client2.loginRequestTest();
-    await delay(100);
+    await delay(1000);
     client1.matchRequestTest();
     client2.matchRequestTest();
-    await delay(100);
   }
 }
 
 async function loginTest() {
-  for (let i = 1; i <= 100; i++) {
+  const count = 500;
+  for (let i = 1; i <= count; i++) {
     const id = 'test' + i;
     const password = '1234';
     const client = new Client(id, password);
-    await delay(100);
+    await delay(10);
+    client.loginRequestTest();
   }
 }
 
@@ -220,7 +245,8 @@ async function registerTest() {
     const id = 'test' + i;
     const password = '1234';
     const client = new Client(id, password);
-    await delay(5);
+    await delay(10);
+    client.registerRequestTest();
   }
 }
 
