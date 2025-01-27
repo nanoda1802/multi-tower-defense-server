@@ -1,4 +1,11 @@
-import { BASE_HP, INITIAL_GOLD, MONSTER_GOLD, MONSTER_SCORE, MONSTER_SPAWN_INTERVAL, TOWER_COST } from './constants/game.js';
+import {
+  BASE_HP,
+  INITIAL_GOLD,
+  MONSTER_GOLD,
+  MONSTER_SCORE,
+  MONSTER_SPAWN_INTERVAL,
+  TOWER_COST,
+} from './constants/game.js';
 import userState from './constants/user.js';
 import env from './env/env.js';
 import header from './packet/header.js';
@@ -51,12 +58,12 @@ const config = {
     baseHp: BASE_HP,
     monsterSpawnInterval: MONSTER_SPAWN_INTERVAL,
     monsterGold: MONSTER_GOLD,
-    monsterScore: MONSTER_SCORE
+    monsterScore: MONSTER_SCORE,
   },
   userState: {
     waiting: userState.WAITING,
     matchMaking: userState.MATCH_MAKING,
-    gamePlaying: userState.GAME_PLAYING,
+    playing: userState.PLAYING,
   },
 };
 

@@ -27,6 +27,9 @@ const selectUserData = async (id) => {
 /* 게임 종료 시 실행하는 쿼리 함수 */
 const updateUserData = async (winCount, loseCount, mmr, highScore, userKey) => {
   try {
+    // const connection = pools.USER_DB.getConnection();
+    // await connection.beginTransaction;
+
     // [1] 게임 진행 정보 최신화하기
     await pools.USER_DB.execute(USERS_QUERIES.UPDATE_USER, [
       winCount,

@@ -1,6 +1,8 @@
-import startMatch from '../../utils/match/start.match.js';
 import Player from '../in-game/player.class.js';
 import EloRank from 'elo-rank';
+import config from '../../config/configs.js';
+
+const { userState } = config;
 
 /* EloRank 인스턴스 생성 */
 // Elo는 이 레이팅 시스템 개발하신 학자 성함이래여
@@ -29,8 +31,7 @@ class Room {
     // [3] 유저들 각각의 Player 인스턴스 생성해 룸에 투입
     this.players.set(userA.id, new Player(userA, userB.id));
     this.players.set(userB.id, new Player(userB, userA.id));
-    // [3] 매치 시작 핸들러 실행
-    startMatch(this);
+
     /* 밑은 기존 코드 */
     // for (let user of users) {
     //   user.enterRoom(this.id);
@@ -41,9 +42,10 @@ class Room {
 
   /* 룸 비우기 */
   clearRoom() {
-    // [1] 소속 유저들 roomId 초기화
+    // [1] 소속 유저들 roomId 초기화 및 "대기" 상태로 변경
     for (const player of this.players.values()) {
       player.user.roomId = null;
+      player.user.state = userState.waiting;
     }
     // [2] Map 인스턴스 초기화
     this.players.clear();
