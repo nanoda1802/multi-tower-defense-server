@@ -1,7 +1,7 @@
 const userState = {
   WAITING: 'waiting',
   MATCH_MAKING: 'matchMaking',
-  GAME_PLAYING: 'gamePlaying',
+  PLAYING: 'playing',
 };
 
 export default userState;

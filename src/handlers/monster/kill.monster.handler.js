@@ -8,6 +8,7 @@ export const killMonsterHandler = (socket, payload) => {
   // [2] 플레이어 찾기
   const user = userSession.getUser(socket);
   const room = roomSession.getRoom(user.roomId);
+  if (!room) return;
   const player = room.getPlayer(user.id);
   // [3] 몬스터 사망 처리
   if (!player.getMonster(monsterId)) {
