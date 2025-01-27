@@ -10,6 +10,7 @@ export const spawnMonsterHandler = (socket) => {
   const monsterNumber = Math.ceil(Math.ceil(Math.random() * 10) / 2); //1~5 랜덤생성
   const user = userSession.getUser(socket); //소켓으로 유저 찾기
   const room = roomSession.getRoom(user.roomId); //유저로 룸 찾기
+  if (!room) return;
   const player = room.getPlayer(user.id);
   const monsterId = room.getMonsterId(); //이거 잘 작동하는지 확인
   // [2] 몬스터 데이터 player에 넣어주기

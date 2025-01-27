@@ -76,8 +76,8 @@ class Room {
   /* mmr 최신화하기 */
   updateMmr(matchResult) {
     // [1] 승리 유저와 패배 유저 구분
-    const winner = this.players.get(matchResult.winner).user;
-    const loser = this.players.get(matchResult.loser).user;
+    const winner = matchResult.winner;
+    const loser = matchResult.loser;
     // [2] 각각의 예상 승리 확률 계산
     const winProbability = {
       winner: elo.getExpected(winner.mmr, loser.mmr),
