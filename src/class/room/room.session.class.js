@@ -91,13 +91,13 @@ class RoomSession {
 
   async finishMatch(room, user) {
     // [1] 매치 결과 기록할 객체 생성
-    const matchResult = { winner: '', loser: '' };
+    const matchResult = { winner: null, loser: null };
     // [2] 플레이어 별로 결과 적용
     room.players.forEach((player, playerId) => {
       // [2-1] 승패 판정 (패배한 user가 호출하게 됨)
       const isWin = playerId === user.id ? false : true;
-      if (isWin) matchResult.winner = playerId;
-      else matchResult.loser = playerId;
+      if (isWin) matchResult.winner = player.user;
+      else matchResult.loser = player.user;
       // [2-2] gameOverNotification 패킷 만들어 전송
       player.user.sendPacket(config.packetType.gameOverNotification, { isWin });
       // [2-3] 전적 및 최고 기록 최신화
@@ -109,15 +109,9 @@ class RoomSession {
     this.deleteRoom(room.id);
     // [5] 전적과 mmr, 하이스코어 데이터베이스에 저장
     try {
-      await updateUserData(
-        user.matchRecord.win,
-        user.matchRecord.lose,
-        user.mmr,
-        user.highScore,
-        user.key,
-      );
+      await updateUserData(matchResult.winner, matchResult.loser);
     } catch (error) {
-      console.error(`로그아웃 처리 중 문제 발생!! `, error);
+      console.error(`매치 결과 기록 중 문제 발생!! `, error);
     }
   }
 }
