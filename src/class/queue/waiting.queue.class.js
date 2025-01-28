@@ -49,8 +49,13 @@ class WaitingQueue {
         }
       }
     }
-    setTimeout(this.startMatchMaking, 1000);
+    if (!isMatchFound) {
+      setTimeout(this.startMatchMaking, 1000);
+    } else {
+      this.startMatchMaking();
+    }
   };
+
   //매칭 성공
   onFoundMatch(users) {
     for (let user of users) {
