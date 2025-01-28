@@ -10,6 +10,7 @@ import attackMonsterHandler from '../handlers/tower/attack.monster.handler.js';
 import attackBaseHandler from '../handlers/monster/attack.base.handler.js';
 import { killMonsterHandler } from '../handlers/monster/kill.monster.handler.js';
 
+/* Data 이벤트 리스너 */
 export const onData = (socket) => async (data) => {
   try {
     socket.buffer = Buffer.concat([socket.buffer, data]);
@@ -58,14 +59,14 @@ export const onData = (socket) => async (data) => {
           const gamePacket = proto.decode(payloadBuffer);
           const payload = gamePacket[gamePacket.payload];
 
-          console.log('------------- 받는 값 -------------');
+          console.log('------------- 받은 패킷 -------------');
           console.log('type:', packetType);
           console.log('versionLength:', versionByte);
           console.log('version:', version);
           console.log('sequence', sequence);
           console.log('payloadLength', payloadLength);
           console.log('payload', payload);
-          console.log('-------------------------------');
+          console.log('------------------------------------');
 
           // 패킷타입별 핸들러 실행
           switch (packetType) {

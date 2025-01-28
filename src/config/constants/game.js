@@ -1,6 +1,9 @@
+export const PATH_COUNT = 5;
 export const INITIAL_GOLD = 100;
+export const INITIAL_SCORE = 0;
 export const TOWER_COST = 10;
 export const BASE_HP = 100;
 export const MONSTER_SPAWN_INTERVAL = 1;
 export const MONSTER_GOLD = 5;
 export const MONSTER_SCORE = 100;
+export const MMR_RANGE = 100;

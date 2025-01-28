@@ -45,13 +45,13 @@ const validateRegisterInfo = async (id, password, email) => {
   if (!isValidateEmail) return makeFailPayload('email');
   // [4] 모든 검사 통과 시 비밀번호 암호화
   const hashedPassword = await bcrypt.hash(password, 5);
-  // [5] DB에 회원 정보 저장 (쿼리 실행)
+  // [5] DB에 계정 정보 저장 (쿼리 실행)
   try {
     await insertUserData(id, hashedPassword, email);
   } catch (err) {
-    // [5 -> 실패A] 중복 아이디 입력 시
+    // [실패A] 중복 아이디 입력 시
     if (err.code === 'ER_DUP_ENTRY') return makeFailPayload('duplicate');
-    // [5 -> 실패B] 예외적인 오류 발생 시
+    // [실패B] 예외적인 오류 발생 시
     console.error('회원가입 처리 중 문제 발생!!', err);
     return {
       success: false,
