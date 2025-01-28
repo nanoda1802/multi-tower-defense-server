@@ -17,9 +17,10 @@ const selectUserData = async (id) => {
   try {
     // [1] 유저 정보와 랭크 정보 가져오기
     const [user] = await pools.USER_DB.execute(USERS_QUERIES.SELECT_USER, [id]);
+    // [2] 요청받은 아이디에 해당하는 유저 데이터 반환
     return user[0];
   } catch (error) {
-    // [2] 실패 시 에러 객체 상위 함수로 전달
+    // [3] 실패 시 에러 객체 상위 함수로 전달
     throw error;
   }
 };
@@ -50,12 +51,12 @@ const updateUserData = async (userA, userB) => {
     // [3] 트랜잭션 종료
     await connection.commit();
   } catch (error) {
-    // [3-1] 쿼리 도중 오류 발생 시 트랜잭션 롤백
+    // [4-1] 트랜잭션 도중 오류 발생 시 롤백
     await connection.rollback();
-    // [3-2] 에러 객체 상위 함수로 전달
+    // [4-2] 에러 객체 상위 함수로 전달
     throw error;
   } finally {
-    // [4] 성공하든 실패하든 다 쓴 연결 풀로 복귀
+    // [5] 성공하든 실패하든 사용 마친 연결 풀로 복귀시킴
     connection.release();
   }
 };

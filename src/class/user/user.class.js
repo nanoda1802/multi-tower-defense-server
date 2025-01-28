@@ -1,8 +1,10 @@
 import { getProtoMessages } from '../../init/load.proto.js';
 import config from '../../config/configs.js';
 
+/* 필요한 환경변수 꺼내오기 */
 const { userState } = config;
 
+/* User 클래스 */
 class User {
   constructor(socket) {
     this.key = null;
@@ -10,7 +12,6 @@ class User {
     this.roomId = null;
     this.socket = socket;
     this.state = userState.waiting; // "waiting", "matchMaking", "playing"
-
     this.matchRecord = {
       win: null,
       lose: null,
@@ -20,8 +21,9 @@ class User {
     this.sequence = 1;
   }
 
+  /* 로그인 시 유저 정보 연동해주는 메서드 */
   login(key, userId, winCount, loseCount, mmr, highScore) {
-    this.key = key;
+    this.key = key; // users 테이블에서 해당 유저의 기본 키 값
     this.id = userId;
     this.matchRecord.win = winCount;
     this.matchRecord.lose = loseCount;
@@ -29,34 +31,36 @@ class User {
     this.highScore = highScore;
   }
 
+  /* 룸 참여 시 소속 룸의 아이디 연동해주는 메서드 */
   enterRoom(roomId) {
     this.roomId = roomId;
   }
 
+  /* 유저의 state 변경해주는 메서드 삼총사 */
+  waiting() {
+    this.state = userState.waiting;
+  }
   matchMaking() {
     this.state = userState.matchMaking;
   }
-
   playing() {
     this.state = userState.playing;
   }
 
-  /* 경기 결과 최신화시키기 */
+  /* 경기 결과 최신화시키는 메서드 */
   updateMatchRecord(isWin, scoreResult) {
-    // [1] 이겼으면 승수 + 1, 졌으면 패수 + 1
-    if (isWin) {
-      this.matchRecord.win += 1;
-    } else {
-      this.matchRecord.lose += 1;
-    }
+    // [1] 이겼으면 승수를, 졌으면 패수를 증가시킴
+    isWin ? (this.matchRecord.win += 1) : (this.matchRecord.lose += 1);
     // [2] 획득 점수가 최고 기록 보다 높다면 최신화
     if (scoreResult > this.highScore) this.highScore = scoreResult;
   }
 
+  /* 현재 시퀀스 조회하고 증가시키는 메서드 */
   getSequence() {
     return this.sequence++;
   }
 
+  /* 유형에 맞는 패킷 준비해 보내는 메서드 */
   sendPacket(packetType, payload) {
     //패킷타입 (number -> string)
     const packetTypeValues = Object.values(config.packetType);
@@ -75,14 +79,14 @@ class User {
 
     if (true) {
       // 콘솔로그 필터링하려면 조건 입력
-      console.log('------------- 주는 값 -------------');
+      console.log('------------- 보내는 패킷 -------------');
       console.log(`type: ${packetType}.${packetTypeName}`);
       console.log('versionLength:', versionLength);
       console.log('version:', version);
       console.log('sequence:', this.sequence);
       console.log('payloadLength:', payloadLength);
       console.log('payload:', message);
-      console.log('-------------------------------');
+      console.log('--------------------------------------');
     }
 
     // 헤더 필드 - 패킷 타입
@@ -115,7 +119,7 @@ class User {
 
     // 패킷
     const packetBuffer = Buffer.concat([headerBuffer, payloadBuffer]);
-    // 메서드 합치다가 여기 그냥 packet이여서 오류 남!! packetBuffer로 변경
+
     this.socket.write(packetBuffer);
   }
 }

@@ -30,12 +30,14 @@ const makeFailPayload = (type = 'none') => {
 
 /* 요청받은 정보 검증 후 처리하고 적절한 페이로드 준비하는 함수 */
 const verifyLoginInfo = async (user, id, password) => {
-  // [1] DB에서 유저 정보 가져오기
+  // [1] 요청된 유저와 일치하는 정보가 없는 경우
+  if (!user) return makeFailPayload('user');
+  // [2] DB에서 유저 정보 가져오기 (쿼리 실행)
   let userData = null;
   try {
     userData = await selectUserData(id);
   } catch (err) {
-    // [1 -> 실패] 오류 출력
+    // [실패] 예외적인 오류 발생 시
     console.error('로그인 처리 중 문제 발생!!', err);
     return {
       success: false,
@@ -43,8 +45,6 @@ const verifyLoginInfo = async (user, id, password) => {
       failCode: GlobalFailCode.UNKNOWN_ERROR,
     };
   }
-  // [2] 요청된 유저와 일치하는 정보가 없는 경우
-  if (!userData) return makeFailPayload('user');
   // [3] 이미 로그인된 계정인지 검증
   for (const account of userSession.users.values()) {
     if (account.id === userData.id) {
@@ -57,7 +57,7 @@ const verifyLoginInfo = async (user, id, password) => {
   if (!isRightPassword) return makeFailPayload('password');
   // [5] 모든 검증 통과 시 jwt 생성
   const token = jwt.sign({ userId: userData.id }, config.env.secretKey);
-  // [6] 깡통 유저에 로그인 정보 넣어주기
+  // [6] 깡통 유저에 계정 정보 연동하기
   user.login(
     userData.user_key,
     userData.id,
