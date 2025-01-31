@@ -1,4 +1,5 @@
 import { getProtoMessages } from '../../init/load.proto.js';
+import { printHeader } from '../../utils/send-packet/printHeader.js';
 import config from '../../config/configs.js';
 
 /* 필요한 환경변수 꺼내오기 */
