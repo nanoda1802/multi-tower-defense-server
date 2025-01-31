@@ -1,8 +1,9 @@
-import { getProtoMessages, loadProtos } from './load.proto.js';
+import { loadProtos } from './load.proto.js';
 
 const initServer = async () => {
   await loadProtos();
-  //console.log(Object.keys(getProtoMessages()));
+  // 디벨롭 예정
+  // 테스트 쿼리 작동 로직 추가
 };
 
 export default initServer;

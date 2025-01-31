@@ -1,6 +1,6 @@
 import config from '../config/configs.js';
 import { getProtoMessages } from '../init/load.proto.js';
-import { roomSession, userSession } from '../session/session.js';
+import { userSession } from '../session/session.js';
 import loginHandler from '../handlers/user/login.handler.js';
 import registerHandler from '../handlers/user/register.handler.js';
 import findMatchHandler from '../handlers/match/find.match.handler.js';
@@ -12,7 +12,6 @@ import { killMonsterHandler } from '../handlers/monster/kill.monster.handler.js'
 import { printHeader } from '../utils/send-packet/printHeader.js';
 import { makeRegisterResponse } from '../utils/send-packet/payload/response/game.response.js';
 import { GlobalFailCode } from '../utils/send-packet/payload/game.data.js';
-import makePacketBuffer from '../utils/send-packet/makePacket.js';
 
 /* Data 이벤트 리스너 */
 export const onData = (socket) => async (data) => {
@@ -40,12 +39,18 @@ export const onData = (socket) => async (data) => {
         const sequence = socket.buffer.readUInt32BE(
           packetTypeByte + versionLengthByte + versionByte,
         );
-        let expectedSequence = userSession.getUser(socket).getSequence();
+        const user = userSession.getUser(socket);
+        let expectedSequence = user.getSequence();
         if (sequence !== expectedSequence) {
-          console.log(`시퀀스 검증 실패. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${sequence}`);
+          console.log(
+            `시퀀스 검증 실패. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${sequence}`,
+          );
           // 조작된 시퀀스 사용자 연결 종료 처리
-          const packet = makePacketBuffer(config.packetType.registerResponse, 0, makeRegisterResponse(false, '시퀀스 검증 실패', GlobalFailCode.INVALID_REQUEST));
-          socket.end(packet);
+          user.sendPacket(
+            config.packetType.registerResponse,
+            makeRegisterResponse(false, '시퀀스 검증 실패', GlobalFailCode.INVALID_REQUEST),
+          );
+          socket.end();
           return;
         }
 
@@ -64,11 +69,11 @@ export const onData = (socket) => async (data) => {
           const gamePacket = proto.decode(payloadBuffer);
           const payload = gamePacket[gamePacket.payload];
 
-          // 디버깅
-          if (packetType === 7) {
-            printHeader(packetType, versionByte, version, sequence, payloadLength, 'in');
-            console.log('payload :', payload);
-          }
+          // 디버깅 (조건식 조정하면서 원하는 패킷 확인 가능)
+          // if (packetType === 7) {
+          //   printHeader(packetType, versionByte, version, sequence, payloadLength, 'in');
+          //   console.log('payload :', payload);
+          // }
 
           // 패킷타입별 핸들러 실행
           switch (packetType) {

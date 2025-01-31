@@ -76,11 +76,6 @@ class WaitingQueue {
     this.dequeueUser(userB);
     // [2] 두 유저를 위한 룸 생성
     roomSession.addRoom(users);
-
-    /* 아래는 기존 코드!! */
-    // for (let user of users) {
-    //   this.dequeueUser(user);
-    // }
   }
 }
 

@@ -13,6 +13,7 @@ import { updateUserData } from '../../database/user_db/functions.js';
 /* 필요한 환경변수 꺼내오기 */
 const { game, packetType } = config;
 
+/* RoomSession 클래스 */
 class RoomSession {
   rooms = new Map(); // 룸들 관리할 Map 인스턴스
 
@@ -44,11 +45,6 @@ class RoomSession {
   /* 특정 룸 조회하는 메서드 */
   getRoom(roomId) {
     return this.rooms.get(roomId);
-  }
-
-  /* 전체 룸 조회하는 메서드 */
-  getAllRoom() {
-    return this.rooms.values();
   }
 
   /* 게임 시작 통신하는 메서드 */
@@ -110,7 +106,7 @@ class RoomSession {
       player.user.updateMatchRecord(isWin, player.score);
     });
     // [3] 각 유저 mmr 최신화
-    room.updateMmr(matchResult);
+    room.updateMMR(matchResult);
     // [4] 룸 세션에서 매치 종료된 룸 제거
     this.deleteRoom(room.id);
     // [5] 전적과 mmr, 하이스코어 데이터베이스에 저장
@@ -120,53 +116,6 @@ class RoomSession {
       console.error(`매치 결과 기록 중 문제 발생!! `, error);
     }
   }
-
-  /* 아래는 기존 코드 */
-  // startGame(room) {
-  //   let monsterPath = {};
-  //   let playerData = {};
-  //   const playerIds = [];
-  //   //초기값
-  //   const initialGameState = makeInitialGameState(
-  //     game.baseHp,
-  //     game.towerCost,
-  //     game.initialGold,
-  //     game.monsterSpawnInterval,
-  //   );
-
-  //   //길만들기 // 객체 형태로 관리해 달라고 요청 하기.
-  //   room.players.forEach((player) => {
-  //     monsterPath[player.user.id] = makePath(5);
-  //     playerData[player.user.id] = makeGameState(
-  //       player.gold,
-  //       makeBaseData(player.base.hp, player.base.maxHp),
-  //       player.user.highScore,
-  //       [],
-  //       [],
-  //       room.monsterLevel,
-  //       player.score,
-  //       monsterPath[player.user.id],
-  //       monsterPath[player.user.id][monsterPath[player.user.id].length - 1],
-  //     );
-  //     playerIds.push(player.user.id);
-  //   });
-
-  //   // 전달
-  //   room.players.forEach((player) => {
-  //     const S2CMatchStartNotification = makeMatchStartNotification(
-  //       initialGameState,
-  //       playerData[player.user.id],
-  //       playerData[playerIds.find((e) => e !== player.user.id)],
-  //     );
-
-  //     const packet = makePacketBuffer(
-  //       packetType.matchStartNotification,
-  //       userSession.getUser(player.user.socket).sequence,
-  //       S2CMatchStartNotification,
-  //     );
-  //     player.user.socket.write(packet);
-  //   });
-  // }
 }
 
 export default RoomSession;
