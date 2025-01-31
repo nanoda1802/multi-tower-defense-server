@@ -52,11 +52,14 @@ class WaitingQueue {
           continue;
         }
         // [4-2-2] 찾은 유저와 본인의 mmr 차이가 적정 범위 내라면 매치 성사
-        if (Math.abs(user.mmr - targetUser.mmr) <= this.mmrRange) {
+        if (Math.abs(user.mmr - targetUser.mmr) <= this.mmrRange * user.matchCount) {
+          user.resetMatchCount();
+          targetUser.resetMatchCount();
           this.startMatch([targetUser, user]);
           isMatchFound = true;
           break;
         }
+        user.upMatchCount();
       }
     }
     // [5 A] 한 팀이라도 매치가 성사되지 않았다면 1초 후 재귀 실행
