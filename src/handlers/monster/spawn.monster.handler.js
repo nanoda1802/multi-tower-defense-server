@@ -21,6 +21,19 @@ export const spawnMonsterHandler = (socket) => {
   const monsterNumber = Math.ceil(Math.ceil(Math.random() * 10) / 2);
   // [6] 몬스터 생성 처리
   player.spawnMonster(monsterId, monsterNumber, room.monsterLevel);
-  // [7] 생성 처리에 대한 패킷들 보냄
-  room.sendNotification(player, packetType.spawnMonsterRequest, { monsterId, monsterNumber });
+  // [7] 보낼 정보들 갈무리
+  const data = [
+    {
+      id: user.id,
+      packetType: packetType.spawnMonsterResponse,
+      payload: { monsterId, monsterNumber },
+    },
+    {
+      id: player.opponentId,
+      packetType: packetType.spawnEnemyMonsterNotification,
+      payload: { monsterId, monsterNumber },
+    },
+  ];
+  // [8] 보냄
+  room.notify(data);
 };

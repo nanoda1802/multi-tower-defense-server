@@ -83,72 +83,10 @@ class Room {
   }
 
   /* 플레이어들에게 패킷 보내기 */
-  sendNotification(player, requestType, data) {
-    // [1] request 보낸 플레이어와 상대 플레이어의 유저 인스턴스 구분
-    const requester = player.user;
-    const opponent = this.players.get(player.opponentId).user;
-    // [2] 동적으로 할당할 payload와 responseType 설정
-    let payload = null;
-    let responseType = null;
-    // [3] request의 패킷타입으로 분기 구분
-    switch (requestType) {
-      // [3 A] attackBaseHandler 시점, data는 { baseHp }
-      case packetType.monsterAttackBaseRequest:
-        payload = {
-          requester: { isOpponent: false, ...data },
-          opponent: { isOpponent: true, ...data },
-        };
-        responseType = {
-          requester: packetType.updateBaseHpNotification,
-          opponent: packetType.updateBaseHpNotification,
-        };
-        break;
-      // [3 B] killMonsterHandler 시점, data는 { monsterId }
-      case packetType.monsterDeathNotification:
-        payload = { requester: player.makeSyncPayload(), opponent: data };
-        responseType = {
-          requester: packetType.stateSyncNotification,
-          opponent: packetType.enemyMonsterDeathNotification,
-        };
-        break;
-      // [3 C] spawnMonsterHandler 시점, data는 { monsterId, monsterNumber }
-      case packetType.spawnMonsterRequest:
-        payload = { requester: data, opponent: data };
-        responseType = {
-          requester: packetType.spawnMonsterResponse,
-          opponent: packetType.spawnEnemyMonsterNotification,
-        };
-        break;
-      // [3 D] attackMonsterHandler 시점, data는 { towerId, monsterId }
-      case packetType.towerAttackRequest:
-        payload = { opponent: data };
-        responseType = {
-          opponent: packetType.enemyTowerAttackNotification,
-        };
-        break;
-      // [3 E] purchaseTowerHandler 시점, data는 { towerId, x, y }
-      case packetType.towerPurchaseRequest:
-        payload = { requester: { towerId: data.towerId }, opponent: data };
-        responseType = {
-          requester: packetType.towerPurchaseResponse,
-          opponent: packetType.addEnemyTowerNotification,
-        };
-        break;
-      // [3 F] 정의되지 않은 요청이거나, 매개변수 값이 잘못된 경우
-      default:
-        console.log(`알 수 없는 요청 타입 : ${requestType}`);
-        return;
+  notify(infos) {
+    for (const info of infos) {
+      this.getPlayer(info.id).user.sendPacket(info.packetType, info.payload);
     }
-    // [4] 본인과 상대에게 각각 적절한 패킷 보냄
-    opponent.sendPacket(responseType.opponent, payload.opponent);
-    if (responseType.requester) requester.sendPacket(responseType.requester, payload.requester);
-  }
-
-  /* 예비 브로드캐스트용 메서드 (미사용) */
-  broadcast(packetType, payload) {
-    this.players.forEach((player) => {
-      player.user.sendPacket(packetType, payload);
-    });
   }
 }
 

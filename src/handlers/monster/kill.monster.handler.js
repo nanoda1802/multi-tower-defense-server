@@ -20,6 +20,19 @@ export const killMonsterHandler = (socket, payload) => {
   if (!player.getMonster(monsterId)) return;
   // [6] 모든 정보 조회에 성공했다면 몬스터 처치 처리
   player.killMonster(monsterId);
-  // [7] 처치 처리에 대한 패킷들 보냄
-  room.sendNotification(player, packetType.monsterDeathNotification, { monsterId });
+  // [7] 보낼 정보들 갈무리
+  const data = [
+    {
+      id: user.id,
+      packetType: packetType.stateSyncNotification,
+      payload: player.makeSyncPayload(),
+    },
+    {
+      id: player.opponentId,
+      packetType: packetType.enemyMonsterDeathNotification,
+      payload: { monsterId },
+    },
+  ];
+  // [8] 보냄
+  room.notify(data);
 };
