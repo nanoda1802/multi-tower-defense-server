@@ -20,6 +20,7 @@ class User {
     this.mmr = null;
     this.highScore = null;
     this.sequence = 1;
+    this.matchCount = 1;
   }
 
   /* 로그인 시 유저 정보 연동해주는 메서드 */
@@ -30,6 +31,14 @@ class User {
     this.matchRecord.lose = loseCount;
     this.mmr = mmr;
     this.highScore = highScore;
+  }
+
+  upMatchCount() {
+    this.matchCount += 0.1;
+  }
+  /* 매치 카운트 초기화 시켜주는 용도 */
+  resetMatchCount() {
+    this.matchCount = 1;
   }
 
   /* 룸 참여 시 소속 룸의 아이디 연동해주는 메서드 */
