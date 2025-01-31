@@ -1,9 +1,12 @@
 import {
   BASE_HP,
   INITIAL_GOLD,
+  INITIAL_SCORE,
+  MMR_RANGE,
   MONSTER_GOLD,
   MONSTER_SCORE,
   MONSTER_SPAWN_INTERVAL,
+  PATH_COUNT,
   TOWER_COST,
 } from './constants/game.js';
 import userState from './constants/user.js';
@@ -53,12 +56,15 @@ const config = {
     secretKey: env.SECRET_KEY,
   },
   game: {
+    pathCount: PATH_COUNT,
     initialGold: INITIAL_GOLD,
+    initialScore: INITIAL_SCORE,
     towerCost: TOWER_COST,
     baseHp: BASE_HP,
     monsterSpawnInterval: MONSTER_SPAWN_INTERVAL,
     monsterGold: MONSTER_GOLD,
     monsterScore: MONSTER_SCORE,
+    mmrRange: MMR_RANGE,
   },
   userState: {
     waiting: userState.WAITING,

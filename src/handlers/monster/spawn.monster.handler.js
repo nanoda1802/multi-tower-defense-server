@@ -1,41 +1,39 @@
-import monsterData from '../../assets/monster.js';
 import { roomSession, userSession } from '../../session/session.js';
-import makePacketBuffer from '../../utils/send-packet/makePacket.js';
 import config from '../../config/configs.js';
 
+/* 필요 환경변수 꺼내오기 */
+const { packetType } = config;
+
+/* 몬스터 생성 요청에 대한 핸들러 */
 export const spawnMonsterHandler = (socket) => {
-  //userId로 찾기??
-  // [1] 필요한 데이터 가져오기
-  const data = monsterData; // assets데이터 가져오기
-  const monsterNumber = Math.ceil(Math.ceil(Math.random() * 10) / 2); //1~5 랜덤생성
-  const user = userSession.getUser(socket); //소켓으로 유저 찾기
-  const room = roomSession.getRoom(user.roomId); //유저로 룸 찾기
+  // [1] 요청 보낸 유저 찾기
+  const user = userSession.getUser(socket);
+  if (!user) return;
+  // [2] 해당 유저가 속한 룸 찾기
+  const room = roomSession.getRoom(user.roomId);
   if (!room) return;
+  // [3] 해당 유저의 인게임 정보 찾기 (= Player 인스턴스)
   const player = room.getPlayer(user.id);
-  const monsterId = room.getMonsterId(); //이거 잘 작동하는지 확인
-  // [2] 몬스터 데이터 player에 넣어주기
-  player.spawnMonster(monsterId, monsterNumber); //더 필요한 정보 있으면 넣어주기 유저 둘다 넣어줘야함
-  // [3]  monsterId, monsterNumber 패킷으로 감싸기
-  // let myPacket = makePacketBuffer(config.packetType.spawnMonsterResponse, 0, {monsterId, monsterNumber});
-  // let enemyPacket = makePacketBuffer(config.packetType.spawnEnemyMonsterNotification, 0, {monsterId, monsterNumber});
-  // [4] packet 보내주기
-  // player.user.socket.write(myPacket);
-  // player.user.socket.write(enemyPacket);
-
-  room.players.forEach((player) => {
-    let packet;
-    if (player.user.id === user.id)
-      packet = makePacketBuffer(config.packetType.spawnMonsterResponse, 0, {
-        monsterId,
-        monsterNumber,
-      });
-    else
-      packet = makePacketBuffer(config.packetType.spawnEnemyMonsterNotification, 0, {
-        monsterId,
-        monsterNumber,
-      });
-    player.user.socket.write(packet);
-  });
+  // [4] 새 몬스터에 부여할 식별자 가져오고, 만약 10의 배수 번째 몬스터라면 monsterLevel 증가
+  const monsterId = room.getMonsterId();
+  if (monsterId % 10 === 0) room.increaseLevel();
+  // [5] 몬스터 유형 랜덤 지정 위한 난수 번호 생성 (1 ~ 5)
+  const monsterNumber = Math.ceil(Math.ceil(Math.random() * 10) / 2);
+  // [6] 몬스터 생성 처리
+  player.spawnMonster(monsterId, monsterNumber, room.monsterLevel);
+  // [7] 보낼 정보들 갈무리
+  const data = [
+    {
+      id: user.id,
+      packetType: packetType.spawnMonsterResponse,
+      payload: { monsterId, monsterNumber },
+    },
+    {
+      id: player.opponentId,
+      packetType: packetType.spawnEnemyMonsterNotification,
+      payload: { monsterId, monsterNumber },
+    },
+  ];
+  // [8] 보냄
+  room.notify(data);
 };
-
-//setMonster(monsterId, monsterNumber) =>player1, 2모두에게 들어가야함

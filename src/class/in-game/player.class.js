@@ -9,50 +9,63 @@ import { roomSession } from '../../session/session.js';
 /* 게임 관련 환경변수 꺼내기 */
 const { game } = config;
 
+/* Player 클래스 */
 class Player {
-  /* 베이스, 몬스터, 타워에 필요한 매개변수 말씀해주시면 추가하기 */
   constructor(user, opponentId) {
     this.user = user;
     this.opponentId = opponentId;
-    this.score = 0;
+    this.score = game.initialScore;
     this.gold = game.initialGold;
     this.base = new Base(game.baseHp);
-    this.towers = new Map(); // 여기는 뭐로 식별할지 고민해봐야함
-    this.monsters = new Map(); // 아마 key에 클라에서 보내주는 monsterNumber를?
+    this.towers = new Map(); // 보유 타워 목록
+    this.monsters = new Map(); // 스폰된 몬스터 목록
   }
 
-  /* 베이스, 몬스터, 타워에 필요한 매개변수 말씀해주시면 추가하기 */
+  /* 타워 설치 처리하는 메서드 */
   placeTower(room, x, y) {
-    // 골드가 충분한지 확인
-    if (this.gold < game.towerCost) return -1;
+    // [1] 보유 골드가 모자른 경우 거부
+    if (this.gold < game.towerCost) return null;
     else {
+      // [2] 설치할 타워에 식별자 부여
       const towerId = room.getTowerId();
+      // [3] 설치 가격만큼 골드 차감
       this.gold -= game.towerCost;
-      // 현재 클라이언트에서 생성되는 타워는 TOW00001이 유일하기에 고정
+      // [4] 보유 타워 목록에 설치할 타워 추가 (클라 기준 타워 유형은 Rcode : TOW00001 고정)
       this.towers.set(towerId, new Tower(towerId, x, y, 'TOW00001', this.user.id));
       return towerId;
     }
   }
 
+  /* 특정 타워 인스턴스 조회하는 메서드 */
   getTower(towerId) {
     return this.towers.get(towerId);
   }
 
+  /* 특정 몬스터 인스턴스 조회하는 메서드 */
+  getMonster(monsterId) {
+    return this.monsters.get(monsterId);
+  }
+
+  /* 몬스터 스폰 처리하는 메서드 */
   spawnMonster(monsterId, monsterNumber, level) {
     this.monsters.set(monsterId, new Monster(monsterId, monsterNumber, this.user.id, level));
   }
 
+  /* 몬스터 처치 처리하는 메서드 */
   killMonster(monsterId) {
     this.monsters.delete(monsterId);
     this.gold += game.monsterGold;
     this.score += game.monsterScore;
   }
 
-  getMonster(monsterId) {
-    return this.monsters.get(monsterId);
+  /* 레벨에 맞는 타워 데미지 일괄 적용하는 메서드 */
+  intensifyTowers(level) {
+    for (const tower of this.towers.values()) {
+      tower.levelUp(level);
+    }
   }
 
-  /* 상태 동기화 페이로드 만들기 */
+  /* 상태 동기화 페이로드 만드는 메서드 */
   makeSyncPayload() {
     // [1] 소속 룸에서 현 몬스터레벨 가져옴
     const monsterLevel = roomSession.getRoom(this.user.roomId).monsterLevel;
@@ -74,8 +87,6 @@ class Player {
       monsterData,
     );
   }
-
-  
 }
 
 export default Player;
