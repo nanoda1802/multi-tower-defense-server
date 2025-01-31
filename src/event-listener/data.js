@@ -14,6 +14,7 @@ import { makeRegisterResponse } from '../utils/send-packet/payload/response/game
 import { GlobalFailCode } from '../utils/send-packet/payload/game.data.js';
 import makePacketBuffer from '../utils/send-packet/makePacket.js';
 
+/* Data 이벤트 리스너 */
 export const onData = (socket) => async (data) => {
   try {
     socket.buffer = Buffer.concat([socket.buffer, data]);
