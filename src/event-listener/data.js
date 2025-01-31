@@ -12,6 +12,7 @@ import { killMonsterHandler } from '../handlers/monster/kill.monster.handler.js'
 import { printHeader } from '../utils/send-packet/printHeader.js';
 import { makeRegisterResponse } from '../utils/send-packet/payload/response/game.response.js';
 import { GlobalFailCode } from '../utils/send-packet/payload/game.data.js';
+import onEnd from './end.js';
 
 /* Data 이벤트 리스너 */
 export const onData = (socket) => async (data) => {
@@ -40,6 +41,7 @@ export const onData = (socket) => async (data) => {
           packetTypeByte + versionLengthByte + versionByte,
         );
         const user = userSession.getUser(socket);
+        if(!user) return 
         let expectedSequence = user.getSequence();
         if (sequence !== expectedSequence) {
           console.log(
@@ -50,7 +52,7 @@ export const onData = (socket) => async (data) => {
             config.packetType.registerResponse,
             makeRegisterResponse(false, '시퀀스 검증 실패', GlobalFailCode.INVALID_REQUEST),
           );
-          socket.end();
+          onEnd(socket)();
           return;
         }
 

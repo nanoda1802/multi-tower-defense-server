@@ -282,7 +282,7 @@ async function gameTest(){
 async function invalidSequenceTest() {
   let client1, client2;
   const id1 = 'test1';
-  const id2 = 'test1';
+  const id2 = 'test2';
   const password = '1234';
   client1 = new Client(id1, password);
   client2 = new Client(id2, password);
