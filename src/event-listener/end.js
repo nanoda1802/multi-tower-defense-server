@@ -1,5 +1,4 @@
 import { roomSession, userSession, waitingQueue } from '../session/session.js';
-import { updateUserData } from '../database/user_db/functions.js';
 import config from '../config/configs.js';
 
 /* 필요한 환경변수 가져오기 */
@@ -22,7 +21,6 @@ const onEnd = (socket) => async () => {
   // [3] 유저 세션에서 해당 유저 제거
   userSession.deleteUser(socket);
   // [4] 해당 클라이언트와 연결된 소켓 종료 및 제거
-  socket.end();
   socket.destroy();
 };
 
