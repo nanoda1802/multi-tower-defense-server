@@ -1,4 +1,5 @@
 import { getProtoMessages } from '../../init/load.proto.js';
+import { printHeader } from '../../utils/send-packet/printHeader.js';
 import config from '../../config/configs.js';
 
 /* 필요한 환경변수 꺼내오기 */
@@ -106,10 +107,10 @@ class User {
     ]);
 
     // 디버깅 (조건식 조정하면서 원하는 패킷 확인 가능)
-    // if (packetType === 7) {
-    //   printHeader(packetType, versionLength, version, sequence, payloadLength, 'out');
-    //   console.log('payload', message);
-    // }
+    if (true) {
+      printHeader(packetType, versionLength, version, this.sequence, payloadLength, 'out');
+      console.log('payload', message);
+    }
 
     // 패킷 만들기
     const packetBuffer = Buffer.concat([headerBuffer, payloadBuffer]);
