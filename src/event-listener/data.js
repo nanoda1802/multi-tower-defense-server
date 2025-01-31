@@ -72,10 +72,10 @@ export const onData = (socket) => async (data) => {
           const payload = gamePacket[gamePacket.payload];
 
           // 디버깅 (조건식 조정하면서 원하는 패킷 확인 가능)
-          // if (packetType === 7) {
-          //   printHeader(packetType, versionByte, version, sequence, payloadLength, 'in');
-          //   console.log('payload :', payload);
-          // }
+          if (true) {
+            printHeader(packetType, versionByte, version, sequence, payloadLength, 'in');
+            console.log('payload :', payload);
+          }
 
           // 패킷타입별 핸들러 실행
           switch (packetType) {
