@@ -4,7 +4,6 @@ import config from '../../config/configs.js';
 import { userSession } from '../../session/session.js';
 import { GlobalFailCode } from '../../utils/send-packet/payload/game.data.js';
 import { selectUserData } from '../../database/user_db/functions.js';
-import onEnd from '../../event-listener/end.js';
 
 /* 응답 메세지 유형 */
 const messageType = {
@@ -49,7 +48,6 @@ const verifyLoginInfo = async (user, id, password) => {
   for (const account of userSession.users.values()) {
     if (account.id === userData.id) {
       return makeFailPayload('duplicate');
-      // await onEnd(account.socket)();
     }
   }
   // [4] 비밀번호 일치 여부 검증
@@ -78,9 +76,9 @@ const loginHandler = async (socket, payload) => {
   const { id, password } = payload;
   // [2] 로그인 요청한 유저 찾기
   const user = userSession.getUser(socket);
-  // [3] DB 조회 후 정보 검증하고 응답 페이로드 준비
+  // // [3] DB 조회 후 정보 검증하고 응답 페이로드 준비
   const responsePayload = await verifyLoginInfo(user, id, password);
-  // [4] 패킷 버퍼로 변환해 클라이언트에 송신
+  // // [4] 패킷 버퍼로 변환해 클라이언트에 송신
   user.sendPacket(config.packetType.loginResponse, responsePayload);
 };
 
