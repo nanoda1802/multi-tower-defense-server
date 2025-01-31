@@ -10,6 +10,7 @@ export const killMonsterHandler = (socket, payload) => {
   const { monsterId } = payload;
   // [2] 요청 보낸 유저 찾기
   const user = userSession.getUser(socket);
+  if (!user) return;
   // [3] 해당 유저가 속한 룸 찾기
   const room = roomSession.getRoom(user.roomId);
   if (!room) return;
@@ -21,34 +22,4 @@ export const killMonsterHandler = (socket, payload) => {
   player.killMonster(monsterId);
   // [7] 처치 처리에 대한 패킷들 보냄
   room.sendNotification(player, packetType.monsterDeathNotification, { monsterId });
-
-  /* 밑은 기존 코드 */
-  // room.players.forEach((player) => {
-  //   let packet;
-  //   if (player.user.id === user.id) {
-  //     packet = makePacketBuffer(
-  //       config.packetType.stateSyncNotification,
-  //       0,
-  //       player.makeSyncPayload(),
-  //     );
-  //   } else {
-  //     packet = makePacketBuffer(config.packetType.enemyMonsterDeathNotification, 0, {
-  //       monsterId,
-  //     });
-  //   }
-  //   player.user.socket.write(packet);
-  // });
 };
-
-/* 
-message C2SMonsterDeathNotification {
-    int32 monsterId = 1;
-}
-
-message S2CEnemyMonsterDeathNotification {
-    int32 monsterId = 1;
-}
-    내 클라이언트에서 몬스터 사망 처리시, 상대방 클라이언트에서도 사망처리
-    */
-
-//killMonster(monsterId) => state = 'alive' => 'dead' 로 바꿔줌

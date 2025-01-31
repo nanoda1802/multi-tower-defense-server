@@ -235,7 +235,7 @@ class Client {
 }
 
 /////////////////////////////// 테스트 로직 //////////////////////////////////////////////
-await loadProtos().then(gameTest);
+await loadProtos().then(invalidSequenceTest);
 
 // 게임 테스트
 async function gameTest(){

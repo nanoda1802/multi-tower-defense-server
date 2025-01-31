@@ -29,13 +29,6 @@ class Room {
     // [3] 유저들 각각의 Player 인스턴스 생성해 룸에 투입
     this.players.set(userA.id, new Player(userA, userB.id));
     this.players.set(userB.id, new Player(userB, userA.id));
-
-    /* 밑은 기존 코드 */
-    // for (let user of users) {
-    //   user.enterRoom(this.id);
-    //   this.players.set(user.id, new Player(user.id, user.socket, this.id, user));
-    // }
-    // finishMatchHandler(this);
   }
 
   /* 룸 비우는 메서드 */
@@ -75,7 +68,7 @@ class Room {
   }
 
   /* mmr 최신화하기 */
-  updateMmr(matchResult) {
+  updateMMR(matchResult) {
     // [1] 승리 유저와 패배 유저 구분
     const winner = matchResult.winner;
     const loser = matchResult.loser;
@@ -90,54 +83,54 @@ class Room {
   }
 
   /* 플레이어들에게 패킷 보내기 */
-  sendNotification(player, requestType, properties) {
+  sendNotification(player, requestType, data) {
     // [1] request 보낸 플레이어와 상대 플레이어의 유저 인스턴스 구분
-    const me = player.user;
+    const requester = player.user;
     const opponent = this.players.get(player.opponentId).user;
     // [2] 동적으로 할당할 payload와 responseType 설정
     let payload = null;
     let responseType = null;
     // [3] request의 패킷타입으로 분기 구분
     switch (requestType) {
-      // [3 A] attackBaseHandler 시점, properties는 { baseHp }
+      // [3 A] attackBaseHandler 시점, data는 { baseHp }
       case packetType.monsterAttackBaseRequest:
         payload = {
-          me: { isOpponent: false, ...properties },
-          opponent: { isOpponent: true, ...properties },
+          requester: { isOpponent: false, ...data },
+          opponent: { isOpponent: true, ...data },
         };
         responseType = {
-          me: packetType.updateBaseHpNotification,
+          requester: packetType.updateBaseHpNotification,
           opponent: packetType.updateBaseHpNotification,
         };
         break;
-      // [3 B] killMonsterHandler 시점, properties는 { monsterId }
+      // [3 B] killMonsterHandler 시점, data는 { monsterId }
       case packetType.monsterDeathNotification:
-        payload = { me: player.makeSyncPayload(), opponent: properties };
+        payload = { requester: player.makeSyncPayload(), opponent: data };
         responseType = {
-          me: packetType.stateSyncNotification,
+          requester: packetType.stateSyncNotification,
           opponent: packetType.enemyMonsterDeathNotification,
         };
         break;
-      // [3 C] spawnMonsterHandler 시점, properties는 { monsterId, monsterNumber }
+      // [3 C] spawnMonsterHandler 시점, data는 { monsterId, monsterNumber }
       case packetType.spawnMonsterRequest:
-        payload = { me: properties, opponent: properties };
+        payload = { requester: data, opponent: data };
         responseType = {
-          me: packetType.spawnMonsterResponse,
+          requester: packetType.spawnMonsterResponse,
           opponent: packetType.spawnEnemyMonsterNotification,
         };
         break;
-      // [3 D] attackMonsterHandler 시점, properties는 { towerId, monsterId }
+      // [3 D] attackMonsterHandler 시점, data는 { towerId, monsterId }
       case packetType.towerAttackRequest:
-        payload = { opponent: properties };
+        payload = { opponent: data };
         responseType = {
           opponent: packetType.enemyTowerAttackNotification,
         };
         break;
-      // [3 E] purchaseTowerHandler 시점, properties는 { towerId, x, y }
+      // [3 E] purchaseTowerHandler 시점, data는 { towerId, x, y }
       case packetType.towerPurchaseRequest:
-        payload = { me: { towerId: properties.towerId }, opponent: properties };
+        payload = { requester: { towerId: data.towerId }, opponent: data };
         responseType = {
-          me: packetType.towerPurchaseResponse,
+          requester: packetType.towerPurchaseResponse,
           opponent: packetType.addEnemyTowerNotification,
         };
         break;
@@ -148,43 +141,15 @@ class Room {
     }
     // [4] 본인과 상대에게 각각 적절한 패킷 보냄
     opponent.sendPacket(responseType.opponent, payload.opponent);
-    if (responseType.me) me.sendPacket(responseType.me, payload.me);
+    if (responseType.requester) requester.sendPacket(responseType.requester, payload.requester);
   }
 
-  /* 아래는 기존 코드들 */
-  // broadcastOthers(packetType, payload, id) {
-  //   this.users.forEach((user) => {
-  //     if (user.id !== id) {
-  //       user.sendPacket(packetType, payload);
-  //     }
-  //   });
-  // }
-
-  // broadcast(packetType, payload) {
-  //   this.users.forEach((user) => {
-  //     user.sendPacket(packetType, payload);
-  //   });
-  // }
-
-  // notify(userInfos) {
-  //   for (const info of userInfos) {
-  //     this.players.getPlayer(info.id).user.sendPacket(info.type, info.payload);
-  //   }
-  // }
-
-  // getUser(id) {
-  //   return this.users.get(id);
-  // }
-
-  // getMonsterId() {
-  //   if (this.monsterId % 10 === 0) {
-  //     this.monsterLevel++;
-  //     this.players.forEach((player) =>
-  //       player.towers.forEach((tower) => tower.setLevel(this.monsterLevel)),
-  //     );
-  //   }
-  //   return this.monsterId++;
-  // }
+  /* 예비 브로드캐스트용 메서드 (미사용) */
+  broadcast(packetType, payload) {
+    this.players.forEach((player) => {
+      player.user.sendPacket(packetType, payload);
+    });
+  }
 }
 
 export default Room;

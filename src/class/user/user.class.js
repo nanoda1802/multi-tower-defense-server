@@ -7,7 +7,7 @@ const { userState } = config;
 /* User 클래스 */
 class User {
   constructor(socket) {
-    this.key = null;
+    this.key = null; // 쿼리 시 활용하는 식별자 (users 테이블의 기본 키 값)
     this.id = null;
     this.roomId = null;
     this.socket = socket;
@@ -23,7 +23,7 @@ class User {
 
   /* 로그인 시 유저 정보 연동해주는 메서드 */
   login(key, userId, winCount, loseCount, mmr, highScore) {
-    this.key = key; // users 테이블에서 해당 유저의 기본 키 값
+    this.key = key;
     this.id = userId;
     this.matchRecord.win = winCount;
     this.matchRecord.lose = loseCount;
@@ -105,15 +105,14 @@ class User {
       payloadLengthBuffer,
     ]);
 
-    // 디버깅
-    if (packetType === 7) {
-      printHeader(packetType, versionLength, version, sequence, payloadLength, 'out');
-      console.log('payload', message);
-    }
+    // 디버깅 (조건식 조정하면서 원하는 패킷 확인 가능)
+    // if (packetType === 7) {
+    //   printHeader(packetType, versionLength, version, sequence, payloadLength, 'out');
+    //   console.log('payload', message);
+    // }
 
     // 패킷 만들기
     const packetBuffer = Buffer.concat([headerBuffer, payloadBuffer]);
-
 
     this.socket.write(packetBuffer);
   }

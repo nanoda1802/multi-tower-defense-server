@@ -21,16 +21,6 @@ class UserSession {
   getUser(socket) {
     return this.users.get(socket);
   }
-
-  /* 전체 유저 열람하는 메서드 */
-  getAllUsers() {
-    return this.users.values();
-  }
-
-  /* 유저 세션 초기화하는 메서드 */
-  clearUserSession() {
-    this.users.clear();
-  }
 }
 
 export default UserSession;
