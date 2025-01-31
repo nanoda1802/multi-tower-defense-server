@@ -20,8 +20,21 @@ const purchaseTowerHandler = (socket, payload) => {
   const towerId = player.placeTower(room, x, y);
   // [6] 설치에 실패했다면 핸들러 종료
   if (!towerId) return;
-  // [7] 설치 처리에 대한 패킷들 보냄
-  room.sendNotification(player, packetType.towerPurchaseRequest, { towerId, x, y });
+  // [7] 보낼 정보들 갈무리
+  const data = [
+    {
+      id: user.id,
+      packetType: packetType.towerPurchaseResponse,
+      payload: { towerId },
+    },
+    {
+      id: player.opponentId,
+      packetType: packetType.addEnemyTowerNotification,
+      payload: { towerId, x, y },
+    },
+  ];
+  // [8] 보냄
+  room.notify(data);
 };
 
 export default purchaseTowerHandler;

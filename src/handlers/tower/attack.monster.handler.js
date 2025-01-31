@@ -24,8 +24,16 @@ const attackMonsterHandler = (socket, payload) => {
   if (!monster) return;
   // [7] 모든 정보 조회에 성공했다면 타워의 공격 처리
   tower.attackMonster(monster);
-  // [8] 공격 처리에 대한 패킷들 보냄
-  room.sendNotification(player, packetType.towerAttackRequest, { towerId, monsterId });
+  // [7] 보낼 정보들 갈무리
+  const data = [
+    {
+      id: player.opponentId,
+      packetType: packetType.enemyTowerAttackNotification,
+      payload: { towerId, monsterId },
+    },
+  ];
+  // [8] 보냄
+  room.notify(data);
 };
 
 export default attackMonsterHandler;

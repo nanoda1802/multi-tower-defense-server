@@ -16,8 +16,24 @@ const attackBaseHandler = async (socket, payload) => {
   const player = room.getPlayer(user.id);
   // [4] 모든 정보 조회에 성공했다면 해당 플레이어의 베이스 피격 처리
   const baseHp = player.base.damaged(payload.damage);
-  // [5 A] 베이스 잔여 체력이 있다면 피격 처리에 대한 응답 패킷들 보냄
-  if (baseHp > 0) room.sendNotification(player, packetType.monsterAttackBaseRequest, { baseHp });
+  // [5] 베이스 잔여 체력이 있다면 피격 처리에 대한 응답 패킷들 보냄
+  if (baseHp > 0) {
+    // [5-1] 보낼 정보들 갈무리
+    const data = [
+      {
+        id: user.id,
+        packetType: packetType.updateBaseHpNotification,
+        payload: { isOpponent: false, baseHp },
+      },
+      {
+        id: player.opponentId,
+        packetType: packetType.updateBaseHpNotification,
+        payload: { isOpponent: true, baseHp },
+      },
+    ];
+    // [5-2] 보냄
+    room.notify(data);
+  }
   // [5 B] 베이스 체력 소진 시 게임 종료 처리
   else await roomSession.finishGame(room, user);
 };

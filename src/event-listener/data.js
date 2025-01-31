@@ -1,6 +1,7 @@
 import config from '../config/configs.js';
 import { getProtoMessages } from '../init/load.proto.js';
 import { userSession } from '../session/session.js';
+import onEnd from './end.js';
 import loginHandler from '../handlers/user/login.handler.js';
 import registerHandler from '../handlers/user/register.handler.js';
 import findMatchHandler from '../handlers/match/find.match.handler.js';
@@ -40,6 +41,7 @@ export const onData = (socket) => async (data) => {
           packetTypeByte + versionLengthByte + versionByte,
         );
         const user = userSession.getUser(socket);
+        if (!user) return;
         let expectedSequence = user.getSequence();
         if (sequence !== expectedSequence) {
           console.log(
@@ -50,7 +52,7 @@ export const onData = (socket) => async (data) => {
             config.packetType.registerResponse,
             makeRegisterResponse(false, '시퀀스 검증 실패', GlobalFailCode.INVALID_REQUEST),
           );
-          socket.end();
+          onEnd(socket)();
           return;
         }
 
