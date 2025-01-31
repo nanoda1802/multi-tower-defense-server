@@ -20,27 +20,28 @@ class LoginQueue {
   isThereRequest = false;
 
   /* 로그인 시도한 유저 큐에 넣기 */
-  enqueueUser(user, id, password) {
+  async enqueueUser(user, id, password) {
     if (!this.queue.has(user)) {
-      this.queue.add(user);
-    } else {
-      return;
-    }
+      this.queue.add({user,id,password});
+    } else return;
     if (!this.isThereRequest) {
       this.isThereRequest = true;
-      this.tryLogin(user, id, password);
+      await this.tryLogin();
     }
   }
 
   /* 로그인 완료한 유저 큐에서 빼기 */
   dequeueUser() {
-    if (this.queue.size <= 1) this.isThereRequest = false;
     const firstValue = this.queue.values().next().value;
     this.queue.delete(firstValue);
+    if (this.queue.size === 0) {
+      this.isThereRequest = false;
+    }
   }
 
-  async tryLogin(user, id, password) {
+  async tryLogin() {
     while (this.isThereRequest) {
+      const { user, id, password } = this.queue.values().next().value;
       // [3] DB 조회 후 정보 검증하고 응답 페이로드 준비
       const responsePayload = await this.verifyLoginInfo(user, id, password);
       // [4] 패킷 버퍼로 변환해 클라이언트에 송신
