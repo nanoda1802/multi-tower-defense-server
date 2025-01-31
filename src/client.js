@@ -2,8 +2,11 @@ import net from 'net';
 import { getProtoMessages, loadProtos } from './init/load.proto.js';
 import config from './config/configs.js';
 
-const HOST = '127.0.0.1';
-const PORT = 5555;
+const HOST = config.env.host;
+const PORT = config.env.port;
+
+let idNumber = 1;
+function getIdNumber() { return idNumber++; }
 
 class Client {
   constructor(id, password) {
@@ -12,6 +15,7 @@ class Client {
     this.socket = new net.Socket();
     this.sequence = 1;
     this.buffer = Buffer.alloc(0);
+    this.isConnected = true;
 
     this.socket.connect(PORT, HOST, this.onConnection.bind(this));
     this.socket.on('data', this.onData.bind(this));
@@ -51,10 +55,10 @@ class Client {
             packetTypeByte + versionLengthByte + versionByte,
           );
           if (expectedSequence !== receivedSequence) {
-            console.log(
-              `시퀀스 오류. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${receivedSequence}`,
-            );
-            return;
+            // console.log(
+            //   `시퀀스 오류. 기대 시퀀스:${expectedSequence}, 수신한 시퀀스:${receivedSequence}`,
+            // );
+            // return;
           }
 
           const headerLength =
@@ -77,16 +81,52 @@ class Client {
             // S2C 패킷타입별 핸들러 실행
             switch (packetType) {
               case config.packetType.registerResponse:
+                if(!payload.success)
+                  throw new Error(payload.message);
                 console.log(this.id, payload.message);
                 break;
               case config.packetType.loginResponse:
+                if(!payload.success){
+                  if(payload.message!=='이미 접속된 계정임다!')
+                    throw new Error(payload.message);
+                }
                 console.log(this.id, payload.message);
                 break;
               case config.packetType.matchStartNotification:
                 console.log(this.id, '매칭 성공');
                 break;
-              case config.packetType.matchStartNotification:
-                //console.log('서버로부터 응답', JSON.stringify(payload, null, 2));
+              case config.packetType.stateSyncNotification:
+                console.log(this.id, '상태동기화');
+                break;
+              case config.packetType.towerPurchaseResponse:
+                if(!payload.towerId)
+                  throw new Error('타워구매 응답 에러');
+                break;
+              case config.packetType.addEnemyTowerNotification:
+                if(!payload.towerId)
+                  throw new Error('타워구매 노티파이 에러');
+                break;
+              case config.packetType.spawnMonsterResponse:
+                //console.log(this.id, '몬스터 소환', payload);
+                if (!payload.monsterId || !payload.monsterNumber)
+                  throw new Error('몬스터소환 응답 에러');
+                break;
+              case config.packetType.spawnEnemyMonsterNotification:
+                //console.log(this.id, '적몬스터 소환', payload);
+                if (!payload.monsterId || !payload.monsterNumber)
+                  throw new Error('몬스터소환 노티파이 에러');
+                break;
+              case config.packetType.enemyTowerAttackNotification:
+                if(!payload.towerId || !payload.monsterId)
+                  throw new Error('적 타워 공격 패킷 에러');
+                break;
+              case config.packetType.updateBaseHpNotification:
+                if(!payload.isOpponent || !payload.baseHp)
+                  throw new Error('타워 HP 업데이트 에러');
+              case config.packetType.gameOverNotification:
+                if (!payload)
+                  throw new Error('게임오버 에러');
+                console.log(this.id, payload.isWin?'승리':'패배');
                 break;
               default:
                 console.log('핸들러가 등록되지 않은 패킷 타입 : ', packetType);
@@ -101,7 +141,7 @@ class Client {
     }
   }
 
-  registerRequestTest() {
+  async registerRequestTest() {
     const registerRequestPayload = {
       id: this.id,
       password: this.password,
@@ -110,14 +150,19 @@ class Client {
     this.sendPacket(config.packetType.registerRequest, registerRequestPayload);
   }
 
-  loginRequestTest() {
+  async loginRequestTest() {
     const loginRequestPayload = { id: this.id, password: this.password };
     this.sendPacket(config.packetType.loginRequest, loginRequestPayload);
   }
 
-  matchRequestTest() {
+  async matchRequestTest() {
     const matchRequestPayload = {};
     this.sendPacket(config.packetType.matchRequest, matchRequestPayload);
+  }
+
+  async spawnMonsterRequestTest() {
+    const spawnMonsterRequestPayload = {};
+    this.sendPacket(config.packetType.spawnMonsterRequest, spawnMonsterRequestPayload);
   }
 
   // 버퍼로 변환 및 송신
@@ -178,40 +223,118 @@ class Client {
     return this.sequence++;
   }
 
-  onClose() {
+  async onClose() {
+    this.isConnected = false;
     console.log('Connection closed');
   }
 
-  onError() {
-    console.error('Client error:', err);
+  async onError(err) {
+    this.isConnected = false;
+    console.error('Client error:');
   }
 }
 
 /////////////////////////////// 테스트 로직 //////////////////////////////////////////////
-await loadProtos().then(matchTest);
+await loadProtos().then(gameTest);
+
+// 게임 테스트
+async function gameTest(){
+  const client_count = 200;
+  const spawn_count = 100;
+
+  let start = Date.now();
+  const clients = await Promise.all(Array.from({length: client_count}, async () => {
+    const id = 'test'+getIdNumber();
+    const password = '1234';
+    const client = new Client(id, password);
+    await client.loginRequestTest();
+    return client;
+  }))
+  let end = Date.now();
+  const loginTestTime = (end-start)/1000;
+  await delay(3000);
+  start = Date.now();
+  await Promise.all(clients.map(client => client.matchRequestTest()));
+  end = Date.now();
+  const matchTestTime = (end-start)/1000;
+  await delay(3000);
+
+  start = Date.now();
+  for(let i=0; i<spawn_count; i++){
+    await Promise.all(clients.map(client=>{
+      if(client.isConnected)
+        return client.spawnMonsterRequestTest();
+    }));
+    await delay(1000);
+  }
+  end = Date.now();
+  const gameTestTime = (end-start)/1000;
+
+  console.log(`테스트 클라이언트 수 : ${client_count}`);
+  console.log(`테스트 소환 횟수 : ${spawn_count}`);
+  console.log(`로그인 테스트 소요 시간 : ${loginTestTime}`);
+  console.log(`매칭 테스트 소요 시간 : ${matchTestTime}`);
+  console.log(`테스트 소요 시간 : ${gameTestTime}`);
+  console.log('부하테스트 완료');
+}
+
+// 시퀀스 조작 테스트
+async function invalidSequenceTest() {
+  let client1, client2;
+  const id1 = 'test1';
+  const id2 = 'test1';
+  const password = '1234';
+  client1 = new Client(id1, password);
+  client2 = new Client(id2, password);
+  await delay(10);
+  client1.loginRequestTest();
+  client2.loginRequestTest();
+  await delay(1000);
+  client1.matchRequestTest();
+  client2.matchRequestTest();
+  await delay(1000);
+  console.log('몬스터 소환 시작');
+  for (let i = 0; i < 10; i++) {
+    if (i === 5) client2.getSequence();
+    client1.spawnMonsterRequestTest();
+    client2.spawnMonsterRequestTest();
+    await delay(500);
+    if(!client1.isConnected){
+      console.log('클라이언트1 종료');
+      break;
+    }
+    if(!client2.isConnected){
+      console.log('클라이언트2 종료');
+      break;
+    }
+  }
+}
 
 async function matchTest() {
-  for (let i = 1; i <= 10; i+=2) {
+  let client1, client2;
+  for (let i = 1; i <= 10; i += 2) {
     const id1 = 'test' + i;
-    const id2 = 'test' + (i+1);
+    const id2 = 'test' + (i + 1);
     const password = '1234';
-    const client1 = new Client(id1, password);
-    const client2 = new Client(id2, password);
+    client1 = new Client(id1, password);
+    client2 = new Client(id2, password);
+    await delay(10);
     client1.loginRequestTest();
     client2.loginRequestTest();
-    await delay(100);
+    await delay(1000);
     client1.matchRequestTest();
     client2.matchRequestTest();
-    await delay(100);
   }
 }
 
 async function loginTest() {
-  for (let i = 1; i <= 100; i++) {
+  const count = 10000;
+  for (let i = 1; i <= count; i++) {
     const id = 'test' + i;
     const password = '1234';
     const client = new Client(id, password);
-    await delay(100);
+    await delay(5);
+    client.loginRequestTest();
   }
 }
 
@@ -220,7 +343,8 @@ async function registerTest() {
     const id = 'test' + i;
     const password = '1234';
     const client = new Client(id, password);
-    await delay(5);
+    await delay(10);
+    client.registerRequestTest();
   }
 }
 
