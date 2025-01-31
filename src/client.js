@@ -109,13 +109,20 @@ class Client {
               case config.packetType.spawnMonsterResponse:
                 //console.log(this.id, '몬스터 소환', payload);
                 if (!payload.monsterId || !payload.monsterNumber)
-                  throw new Error('몬스터소환요청 응답 에러');
+                  throw new Error('몬스터소환 응답 에러');
                 break;
               case config.packetType.spawnEnemyMonsterNotification:
                 //console.log(this.id, '적몬스터 소환', payload);
                 if (!payload.monsterId || !payload.monsterNumber)
                   throw new Error('몬스터소환 노티파이 에러');
                 break;
+              case config.packetType.enemyTowerAttackNotification:
+                if(!payload.towerId || !payload.monsterId)
+                  throw new Error('적 타워 공격 패킷 에러');
+                break;
+              case config.packetType.updateBaseHpNotification:
+                if(!payload.isOpponent || !payload.baseHp)
+                  throw new Error('타워 HP 업데이트 에러');
               case config.packetType.gameOverNotification:
                 if (!payload)
                   throw new Error('게임오버 에러');
@@ -228,33 +235,10 @@ class Client {
 }
 
 /////////////////////////////// 테스트 로직 //////////////////////////////////////////////
-await loadProtos().then(connectionLimitTest);
+await loadProtos().then(gameTest);
 
-// 최대 접속자 수 테스트
-async function connectionLimitTest() {
-  const client_count = 100;
-  const tests = [];
-  try {
-    while(true){
-      const clients = await Promise.all(Array.from({length: client_count}, async () => {
-        const id = 'test'+getIdNumber();
-        const password = '1234';
-        const client = new Client(id, password);
-        await client.loginRequestTest();
-        if(client.isConnected)
-        return client;
-      }));
-    }
-  } catch (error) {
-    
-  }
-  console.log('1차 테스트 완료');
-  // await delay(3000);
-  // console.log('2차 테스트 완료');
-}
-
-// 게임 실행 및 몬스터 소환 테스트
-async function monsterSpawnTest(){
+// 게임 테스트
+async function gameTest(){
   const client_count = 200;
   const spawn_count = 100;
 
@@ -284,13 +268,13 @@ async function monsterSpawnTest(){
     await delay(1000);
   }
   end = Date.now();
-  const spawnTestTime = (end-start)/1000;
+  const gameTestTime = (end-start)/1000;
 
   console.log(`테스트 클라이언트 수 : ${client_count}`);
   console.log(`테스트 소환 횟수 : ${spawn_count}`);
   console.log(`로그인 테스트 소요 시간 : ${loginTestTime}`);
   console.log(`매칭 테스트 소요 시간 : ${matchTestTime}`);
-  console.log(`소환 테스트 소요 시간 : ${spawnTestTime}`);
+  console.log(`테스트 소요 시간 : ${gameTestTime}`);
   console.log('부하테스트 완료');
 }
 
