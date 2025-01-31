@@ -14,26 +14,14 @@ const insertUserData = async (id, password, email) => {
 
 /* 로그인 시 실행하는 쿼리 함수 */
 const selectUserData = async (id) => {
-  // [1] 풀에서 연결 하나 꺼내옴
-  const connection = await pools.USER_DB.getConnection();
   try {
-    // [2] 트랜잭션 시작
-    await connection.beginTransaction();
-    await connection.execute(USERS_QUERIES.SET_ISOLATION);
-    // [3] 유저 정보와 랭크 정보 가져오기
-    const [user] = await connection.execute(USERS_QUERIES.SELECT_USER, [id]);
-    // [4] 트랜잭션 종료
-    await connection.commit();
-    // [5] 요청받은 아이디에 해당하는 유저 데이터 반환
+    // [1] 요청받은 아이디에 해당하는 유저 데이터 확인
+    const [user] = await pools.USER_DB.execute(USERS_QUERIES.SELECT_USER, [id]);
+    // [2] 요청받은 아이디에 해당하는 유저 데이터 반환
     return user[0];
   } catch (error) {
-    // [4-1] 트랜잭션 도중 오류 발생 시 롤백
-    await connection.rollback();
-    // [4-2] 실패 시 에러 객체 상위 함수로 전달
+    // [3] 실패 시 에러 객체 상위 함수로 전달
     throw error;
-  } finally {
-    // [6] 성공하든 실패하든 사용 마친 연결 풀로 복귀시킴
-    connection.release();
   }
 };
 
