@@ -116,8 +116,8 @@ class User {
     ]);
 
     // 디버깅 (조건식 조정하면서 원하는 패킷 확인 가능)
-    if (true) {
-      printHeader(packetType, versionLength, version, sequence, payloadLength, 'out');
+    if (packetType === 4) {
+      printHeader(packetType, versionLength, version, this.sequence, payloadLength, 'out');
       console.log('payload', message);
     }
 

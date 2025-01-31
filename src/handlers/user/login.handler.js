@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import config from '../../config/configs.js';
-import { userSession } from '../../session/session.js';
+import { loginQueue, userSession } from '../../session/session.js';
 import { GlobalFailCode } from '../../utils/send-packet/payload/game.data.js';
 import { selectUserData } from '../../database/user_db/functions.js';
 
@@ -76,10 +76,12 @@ const loginHandler = async (socket, payload) => {
   const { id, password } = payload;
   // [2] 로그인 요청한 유저 찾기
   const user = userSession.getUser(socket);
-  // [3] DB 조회 후 정보 검증하고 응답 페이로드 준비
-  const responsePayload = await verifyLoginInfo(user, id, password);
-  // [4] 패킷 버퍼로 변환해 클라이언트에 송신
-  user.sendPacket(config.packetType.loginResponse, responsePayload);
+
+  await loginQueue.enqueueUser(user, id, password)
+  // // [3] DB 조회 후 정보 검증하고 응답 페이로드 준비
+  // const responsePayload = await verifyLoginInfo(user, id, password);
+  // // // [4] 패킷 버퍼로 변환해 클라이언트에 송신
+  // user.sendPacket(config.packetType.loginResponse, responsePayload);
 };
 
 export default loginHandler;
