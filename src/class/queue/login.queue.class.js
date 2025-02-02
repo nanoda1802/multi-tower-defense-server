@@ -16,13 +16,13 @@ const messageType = {
 
 /* LoginQueue 클래스 */
 class LoginQueue {
-  queue = new Set();
+  queue = new Map();
   isThereRequest = false;
 
   /* 로그인 시도한 유저 큐에 넣기 */
   async enqueueUser(user, id, password) {
     if (!this.queue.has(user)) {
-      this.queue.add({user,id,password});
+      this.queue.set(user, { id, password });
     } else return;
     if (!this.isThereRequest) {
       this.isThereRequest = true;
@@ -31,9 +31,8 @@ class LoginQueue {
   }
 
   /* 로그인 완료한 유저 큐에서 빼기 */
-  dequeueUser() {
-    const firstValue = this.queue.values().next().value;
-    this.queue.delete(firstValue);
+  dequeueUser(key) {
+    this.queue.delete(key);
     if (this.queue.size === 0) {
       this.isThereRequest = false;
     }
@@ -41,12 +40,14 @@ class LoginQueue {
 
   async tryLogin() {
     while (this.isThereRequest) {
-      const { user, id, password } = this.queue.values().next().value;
+      // 대기열의 첫번째 값 가져오기
+      const { id, password } = this.queue.values().next().value;
+      const user = this.queue.keys().next().value;
       // [3] DB 조회 후 정보 검증하고 응답 페이로드 준비
       const responsePayload = await this.verifyLoginInfo(user, id, password);
       // [4] 패킷 버퍼로 변환해 클라이언트에 송신
       user.sendPacket(config.packetType.loginResponse, responsePayload);
-      this.dequeueUser();
+      this.dequeueUser(user);
     }
   }
 
@@ -65,9 +66,7 @@ class LoginQueue {
 
   /* 요청받은 정보 검증 후 처리하고 적절한 페이로드 준비하는 메서드 */
   async verifyLoginInfo(user, id, password) {
-    // [1] 요청된 유저와 일치하는 정보가 없는 경우
-    if (!user) return this.makeFailPayload('user');
-    // [2] DB에서 유저 정보 가져오기 (쿼리 실행)
+    // [1] DB에서 유저 정보 가져오기 (쿼리 실행)
     let userData = null;
     try {
       userData = await selectUserData(id);
@@ -80,6 +79,8 @@ class LoginQueue {
         failCode: GlobalFailCode.UNKNOWN_ERROR,
       };
     }
+    // [2] 요청된 유저와 일치하는 정보가 없는 경우
+    if (!userData) return this.makeFailPayload('user');
     // [3] 이미 로그인된 계정인지 검증
     for (const account of userSession.users.values()) {
       if (account.id === userData.id) {
