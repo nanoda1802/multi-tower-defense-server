@@ -16,7 +16,9 @@ const messageType = {
 
 /* LoginQueue 클래스 */
 class LoginQueue {
+  // 대기열
   queue = new Map();
+  // 대기열 상태 확인(작동중인지)
   isThereRequest = false;
 
   /* 로그인 시도한 유저 큐에 넣기 */
