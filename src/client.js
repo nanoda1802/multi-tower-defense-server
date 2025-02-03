@@ -6,7 +6,9 @@ const HOST = config.env.host;
 const PORT = config.env.port;
 
 let idNumber = 1;
-function getIdNumber() { return idNumber++; }
+function getIdNumber() {
+  return idNumber++;
+}
 
 class Client {
   constructor(id, password) {
@@ -81,14 +83,12 @@ class Client {
             // S2C 패킷타입별 핸들러 실행
             switch (packetType) {
               case config.packetType.registerResponse:
-                if(!payload.success)
-                  throw new Error(payload.message);
+                if (!payload.success) throw new Error(payload.message);
                 console.log(this.id, payload.message);
                 break;
               case config.packetType.loginResponse:
-                if(!payload.success){
-                  if(payload.message!=='이미 접속된 계정임다!')
-                    throw new Error(payload.message);
+                if (!payload.success) {
+                  if (payload.message !== '이미 접속된 계정임다!') throw new Error(payload.message);
                 }
                 console.log(this.id, payload.message);
                 break;
@@ -99,12 +99,10 @@ class Client {
                 console.log(this.id, '상태동기화');
                 break;
               case config.packetType.towerPurchaseResponse:
-                if(!payload.towerId)
-                  throw new Error('타워구매 응답 에러');
+                if (!payload.towerId) throw new Error('타워구매 응답 에러');
                 break;
               case config.packetType.addEnemyTowerNotification:
-                if(!payload.towerId)
-                  throw new Error('타워구매 노티파이 에러');
+                if (!payload.towerId) throw new Error('타워구매 노티파이 에러');
                 break;
               case config.packetType.spawnMonsterResponse:
                 //console.log(this.id, '몬스터 소환', payload);
@@ -117,16 +115,15 @@ class Client {
                   throw new Error('몬스터소환 노티파이 에러');
                 break;
               case config.packetType.enemyTowerAttackNotification:
-                if(!payload.towerId || !payload.monsterId)
+                if (!payload.towerId || !payload.monsterId)
                   throw new Error('적 타워 공격 패킷 에러');
                 break;
               case config.packetType.updateBaseHpNotification:
-                if(!payload.isOpponent || !payload.baseHp)
+                if (!payload.isOpponent || !payload.baseHp)
                   throw new Error('타워 HP 업데이트 에러');
               case config.packetType.gameOverNotification:
-                if (!payload)
-                  throw new Error('게임오버 에러');
-                console.log(this.id, payload.isWin?'승리':'패배');
+                if (!payload) throw new Error('게임오버 에러');
+                console.log(this.id, payload.isWin ? '승리' : '패배');
                 break;
               default:
                 console.log('핸들러가 등록되지 않은 패킷 타입 : ', packetType);
@@ -235,40 +232,43 @@ class Client {
 }
 
 /////////////////////////////// 테스트 로직 //////////////////////////////////////////////
-await loadProtos().then(invalidSequenceTest);
+await loadProtos().then(gameTest);
 
 // 게임 테스트
-async function gameTest(){
+async function gameTest() {
   const client_count = 200;
   const spawn_count = 100;
 
   let start = Date.now();
-  const clients = await Promise.all(Array.from({length: client_count}, async () => {
-    const id = 'test'+getIdNumber();
-    const password = '1234';
-    const client = new Client(id, password);
-    await client.loginRequestTest();
-    return client;
-  }))
+  const clients = await Promise.all(
+    Array.from({ length: client_count }, async () => {
+      const id = 'test' + getIdNumber();
+      const password = '1234';
+      const client = new Client(id, password);
+      await client.loginRequestTest();
+      return client;
+    }),
+  );
   let end = Date.now();
-  const loginTestTime = (end-start)/1000;
+  const loginTestTime = (end - start) / 1000;
   await delay(3000);
   start = Date.now();
-  await Promise.all(clients.map(client => client.matchRequestTest()));
+  await Promise.all(clients.map((client) => client.matchRequestTest()));
   end = Date.now();
-  const matchTestTime = (end-start)/1000;
+  const matchTestTime = (end - start) / 1000;
   await delay(3000);
 
   start = Date.now();
-  for(let i=0; i<spawn_count; i++){
-    await Promise.all(clients.map(client=>{
-      if(client.isConnected)
-        return client.spawnMonsterRequestTest();
-    }));
+  for (let i = 0; i < spawn_count; i++) {
+    await Promise.all(
+      clients.map((client) => {
+        if (client.isConnected) return client.spawnMonsterRequestTest();
+      }),
+    );
     await delay(1000);
   }
   end = Date.now();
-  const gameTestTime = (end-start)/1000;
+  const gameTestTime = (end - start) / 1000;
 
   console.log(`테스트 클라이언트 수 : ${client_count}`);
   console.log(`테스트 소환 횟수 : ${spawn_count}`);
@@ -299,11 +299,11 @@ async function invalidSequenceTest() {
     client1.spawnMonsterRequestTest();
     client2.spawnMonsterRequestTest();
     await delay(500);
-    if(!client1.isConnected){
+    if (!client1.isConnected) {
       console.log('클라이언트1 종료');
       break;
     }
-    if(!client2.isConnected){
+    if (!client2.isConnected) {
       console.log('클라이언트2 종료');
       break;
     }

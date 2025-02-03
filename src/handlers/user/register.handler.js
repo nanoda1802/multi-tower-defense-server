@@ -52,7 +52,7 @@ const validateRegisterInfo = async (id, password, email) => {
     // [실패A] 중복 아이디 입력 시
     if (err.code === 'ER_DUP_ENTRY') return makeFailPayload('duplicate');
     // [실패B] 예외적인 오류 발생 시
-    console.error('회원가입 처리 중 문제 발생!!', err);
+    console.error(`회원가입 처리 중 문제가 발생했습니다.\n`, err);
     return {
       success: false,
       message: `DB 문제 발생 : ${err.code}`,
@@ -63,9 +63,7 @@ const validateRegisterInfo = async (id, password, email) => {
   return { success: true, message: messageType.success, failCode: GlobalFailCode.NONE };
 };
 
-/* !!! 회원가입 핸들러 !!! */
-// 요청 페이로드 C2SRegisterRequest {id,password,email}
-// 응답 페이로드 S2CRegisterResponse {success,message,failCode}
+/* 회원가입 핸들러 */
 const registerHandler = async (socket, payload) => {
   // [1] 요청 페이로드에서 가입 정보 추출
   const { id, password, email } = payload;

@@ -8,7 +8,7 @@ const { userState } = config;
 const onEnd = (socket) => async () => {
   // [1] 접속 종료한 유저 검색
   const user = userSession.getUser(socket);
-  console.log(`클라 접속 종료!! : ${user.id}`);
+  console.log(`클라이언트 접속 종료 : ${user.id}`);
   // [2] 유저가 "waiting" 상태가 아닐 때의 처리들
   if (user.state === userState.matchMaking) {
     // [2 A] 매치메이킹 도중 종료 시 대기열에서 제외

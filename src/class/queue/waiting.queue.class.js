@@ -10,7 +10,7 @@ class WaitingQueue {
   /* 유저를 대기열에 투입시키는 메서드 */
   enqueueUser(user) {
     // [1] 이미 대기열에 있는 유저인지 확인
-    if (!this.queue.has(user)) {
+    if (!this.queue.has(user) && user.id !== null) {
       // [1-1] 아니라면 대기열에 유저를 넣어주고, 유저의 state를 "matchMaking"으로 변경
       this.queue.add(user);
       user.matchMaking();
@@ -52,11 +52,14 @@ class WaitingQueue {
           continue;
         }
         // [4-2-2] 찾은 유저와 본인의 mmr 차이가 적정 범위 내라면 매치 성사
-        if (Math.abs(user.mmr - targetUser.mmr) <= this.mmrRange) {
+        if (Math.abs(user.mmr - targetUser.mmr) <= this.mmrRange * user.matchCount) {
+          user.resetMatchCount();
+          targetUser.resetMatchCount();
           this.startMatch([targetUser, user]);
           isMatchFound = true;
           break;
         }
+        user.upMatchCount();
       }
     }
     // [5 A] 한 팀이라도 매치가 성사되지 않았다면 1초 후 재귀 실행

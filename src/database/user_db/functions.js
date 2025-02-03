@@ -15,7 +15,7 @@ const insertUserData = async (id, password, email) => {
 /* 로그인 시 실행하는 쿼리 함수 */
 const selectUserData = async (id) => {
   try {
-    // [1] 유저 정보와 랭크 정보 가져오기
+    // [1] 요청받은 아이디에 해당하는 유저 데이터 확인
     const [user] = await pools.USER_DB.execute(USERS_QUERIES.SELECT_USER, [id]);
     // [2] 요청받은 아이디에 해당하는 유저 데이터 반환
     return user[0];

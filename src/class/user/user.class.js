@@ -20,6 +20,7 @@ class User {
     this.mmr = null;
     this.highScore = null;
     this.sequence = 1;
+    this.matchCount = 1;
   }
 
   /* 로그인 시 유저 정보 연동해주는 메서드 */
@@ -30,6 +31,14 @@ class User {
     this.matchRecord.lose = loseCount;
     this.mmr = mmr;
     this.highScore = highScore;
+  }
+
+  upMatchCount() {
+    this.matchCount += 0.1;
+  }
+  /* 매치 카운트 초기화 시켜주는 용도 */
+  resetMatchCount() {
+    this.matchCount = 1;
   }
 
   /* 룸 참여 시 소속 룸의 아이디 연동해주는 메서드 */
@@ -107,7 +116,7 @@ class User {
     ]);
 
     // 디버깅 (조건식 조정하면서 원하는 패킷 확인 가능)
-    if (true) {
+    if (packetType === 4) {
       printHeader(packetType, versionLength, version, this.sequence, payloadLength, 'out');
       console.log('payload', message);
     }
