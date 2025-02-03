@@ -16,16 +16,16 @@ const messageType = {
 
 /* LoginQueue 클래스 */
 class LoginQueue {
-  // 대기열
-  queue = new Map();
-  // 대기열 상태 확인(작동중인지)
-  isThereRequest = false;
+  queue = new Map(); // 로그인 대기열
+  isThereRequest = false; // 대기열 작동 중인지 확인하는 변수
 
   /* 로그인 시도한 유저 큐에 넣기 */
   async enqueueUser(user, id, password) {
+    // [1] 이미 대기열에 존재하는지 확인 후, 대기열에 유저 투입
     if (!this.queue.has(user)) {
       this.queue.set(user, { id, password });
     } else return;
+    // [2] 로그인 요청이 생겼으니 대기열을 작동 상태로 전환하고 로그인 시도
     if (!this.isThereRequest) {
       this.isThereRequest = true;
       await this.tryLogin();
@@ -33,22 +33,26 @@ class LoginQueue {
   }
 
   /* 로그인 완료한 유저 큐에서 빼기 */
-  dequeueUser(key) {
-    this.queue.delete(key);
+  dequeueUser(user) {
+    // [1] 유저 대기열에서 제외
+    this.queue.delete(user);
+    // [2] 대기열에 남은 유저가 없다면, 대기열을 대기 상태로 전환
     if (this.queue.size === 0) {
       this.isThereRequest = false;
     }
   }
 
+  /* 로그인 시도 메서드 */
   async tryLogin() {
     while (this.isThereRequest) {
-      // 대기열의 첫번째 값 가져오기
+      // [1] 대기열의 첫번째 값 가져오기 (queue 방식 모방)
       const { id, password } = this.queue.values().next().value;
       const user = this.queue.keys().next().value;
-      // [3] DB 조회 후 정보 검증하고 응답 페이로드 준비
+      // [2] DB 조회 후 정보 검증하고 응답 페이로드 준비
       const responsePayload = await this.verifyLoginInfo(user, id, password);
-      // [4] 패킷 버퍼로 변환해 클라이언트에 송신
+      // [3] 패킷 버퍼로 변환해 클라이언트에 송신
       user.sendPacket(config.packetType.loginResponse, responsePayload);
+      // [4] 모든 처리 완료된 유저는 대기열에서 제외
       this.dequeueUser(user);
     }
   }
@@ -74,7 +78,7 @@ class LoginQueue {
       userData = await selectUserData(id);
     } catch (err) {
       // [실패] 예외적인 오류 발생 시
-      console.error('로그인 처리 중 문제 발생!!', err);
+      console.error(`로그인 처리 중 문제가 발생했습니다.\n`, err);
       return {
         success: false,
         message: `DB 문제 발생 : ${err.code}`,

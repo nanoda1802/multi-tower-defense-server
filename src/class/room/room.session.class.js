@@ -113,7 +113,7 @@ class RoomSession {
     try {
       await updateUserData(matchResult.winner, matchResult.loser);
     } catch (error) {
-      console.error(`매치 결과 기록 중 문제 발생!! `, error);
+      console.error(`매치 결과 기록 중 문제가 발생했습니다.\n`, error);
     }
   }
 }

@@ -12,7 +12,7 @@ const startServer = async () => {
   await initServer();
   // [2] 서버 LISTEN 상태로 변경
   server.listen(config.env.port, config.env.host, () => {
-    console.log(`서버 시작!!`);
+    console.log(`서버를 가동합니다.`);
   });
 };
 
