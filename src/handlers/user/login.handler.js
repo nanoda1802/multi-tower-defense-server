@@ -44,18 +44,20 @@ const verifyLoginInfo = async (user, id, password) => {
       failCode: GlobalFailCode.UNKNOWN_ERROR,
     };
   }
-  // [4] 비밀번호 일치 여부 검증
-  const isRightPassword = await bcrypt.compare(password, userData.password);
-  if (!isRightPassword) return makeFailPayload('password');
 
   // [3] 이미 로그인된 계정인지 검증
   console.log("아이디 확인 시작 전")
-  for await (const account of userSession.users.values()) {
+  for (const account of userSession.users.values()) {
     console.log("아이디 확인",account.id, account.socket.remotePort)
     if (account.id === id) {
       return makeFailPayload('duplicate');
     }
   }
+
+  // [4] 비밀번호 일치 여부 검증
+  const isRightPassword = await bcrypt.compare(password, userData.password);
+  if (!isRightPassword) return makeFailPayload('password');
+
   // [5] 모든 검증 통과 시 jwt 생성
   const token = jwt.sign({ userId: userData.id }, config.env.secretKey);
   // [6] 깡통 유저에 계정 정보 연동하기
@@ -83,8 +85,6 @@ const loginHandler = async (socket, payload) => {
   const { id, password } = payload;
   // [2] 로그인 요청한 유저 찾기
   const user = userSession.getUser(socket);
-
-  await loginQueue.enqueueUser(user, id, password)
   // [3] DB 조회 후 정보 검증하고 응답 페이로드 준비
   const responsePayload = await verifyLoginInfo(user, id, password);
   // [4] 패킷 버퍼로 변환해 클라이언트에 송신

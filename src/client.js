@@ -237,7 +237,7 @@ await loadProtos().then(gameTest);
 
 // 게임 테스트
 async function gameTest() {
-  const client_count = 1;
+  const client_count = 200;
   const spawn_count = 100;
 
   await Promise.all(
