@@ -45,7 +45,11 @@ const verifyLoginInfo = async (user, id, password) => {
     };
   }
 
-  // [3] 이미 로그인된 계정인지 검증
+  // [3] 비밀번호 일치 여부 검증
+  const isRightPassword = await bcrypt.compare(password, userData.password);
+  if (!isRightPassword) return makeFailPayload('password');
+
+  // [4] 이미 로그인된 계정인지 검증
   console.log("아이디 확인 시작 전")
   for (const account of userSession.users.values()) {
     console.log("아이디 확인",account.id, account.socket.remotePort)
@@ -53,10 +57,6 @@ const verifyLoginInfo = async (user, id, password) => {
       return makeFailPayload('duplicate');
     }
   }
-
-  // [4] 비밀번호 일치 여부 검증
-  const isRightPassword = await bcrypt.compare(password, userData.password);
-  if (!isRightPassword) return makeFailPayload('password');
 
   // [5] 모든 검증 통과 시 jwt 생성
   const token = jwt.sign({ userId: userData.id }, config.env.secretKey);
