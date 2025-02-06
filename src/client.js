@@ -13,6 +13,7 @@ function getIdNumber() {
 class Client {
   constructor(id, password) {
     this.id = id;
+    this.idx = getIdNumber();
     this.password = password;
     this.socket = new net.Socket();
     this.sequence = 1;
@@ -27,12 +28,12 @@ class Client {
 
   async onConnection() {
     console.log('Connectied to server');
-    this.buffer = Buffer.alloc(0);
+    this.socket.buffer = Buffer.alloc(0);
   }
 
   async onData(data) {
     try {
-      this.buffer = Buffer.concat([this.buffer, data]);
+      this.socket.buffer = Buffer.concat([this.socket.buffer, data]);
 
       const packetTypeByte = config.header.typeByte;
       const versionLengthByte = config.header.versionLengthByte;
@@ -40,20 +41,20 @@ class Client {
       const sequenceByte = config.header.sequenceByte;
       const payloadLengthByte = config.header.payloadLengthByte;
 
-      while (this.buffer.length >= packetTypeByte + versionLengthByte) {
-        versionByte = this.buffer.readUInt8(packetTypeByte);
+      while (this.socket.buffer.length >= packetTypeByte + versionLengthByte) {
+        versionByte = this.socket.buffer.readUInt8(packetTypeByte);
         while (
-          this.buffer.length >=
+          this.socket.buffer.length >=
           packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte
         ) {
           // 버전 검증
           let versionOffset = packetTypeByte + versionLengthByte;
-          const version = this.buffer.slice(versionOffset, versionOffset + versionByte).toString();
+          const version = this.socket.buffer.subarray(versionOffset, versionOffset + versionByte).toString();
           if (!version === config.env.clientVersion) return;
 
           // 시퀀스 검증
           const expectedSequence = this.sequence;
-          const receivedSequence = this.buffer.readUInt32BE(
+          const receivedSequence = this.socket.buffer.readUInt32BE(
             packetTypeByte + versionLengthByte + versionByte,
           );
           if (expectedSequence !== receivedSequence) {
@@ -65,14 +66,14 @@ class Client {
 
           const headerLength =
             packetTypeByte + versionLengthByte + versionByte + sequenceByte + payloadLengthByte;
-          const payloadLength = this.buffer.readUInt32BE(
+          const payloadLength = this.socket.buffer.readUInt32BE(
             packetTypeByte + versionLengthByte + versionByte + sequenceByte,
           );
 
-          if (this.buffer.length >= headerLength + payloadLength) {
-            const packetType = this.buffer.readUInt16BE(0);
-            const payloadBuffer = this.buffer.slice(headerLength, headerLength + payloadLength);
-            this.buffer = this.buffer.slice(headerLength + payloadLength);
+          if (this.socket.buffer.length >= headerLength + payloadLength) {
+            const packetType = this.socket.buffer.readUInt16BE(0);
+            const payloadBuffer = this.socket.buffer.subarray(headerLength, headerLength + payloadLength);
+            this.socket.buffer = this.socket.buffer.subarray(headerLength + payloadLength);
 
             const proto = getProtoMessages().GamePacket;
             const gamePacket = proto.decode(payloadBuffer);
@@ -84,13 +85,13 @@ class Client {
             switch (packetType) {
               case config.packetType.registerResponse:
                 if (!payload.success) throw new Error(payload.message);
-                console.log(this.id, payload.message);
+                console.log(this.id, this.idx, payload.message);
                 break;
               case config.packetType.loginResponse:
                 if (!payload.success) {
                   if (payload.message !== '이미 접속된 계정임다!') throw new Error(payload.message);
                 }
-                console.log(this.id, payload.message);
+                console.log(this.id, this.socket.localPort, payload.message);
                 break;
               case config.packetType.matchStartNotification:
                 console.log(this.id, '매칭 성공');
@@ -236,46 +237,44 @@ await loadProtos().then(gameTest);
 
 // 게임 테스트
 async function gameTest() {
-  const client_count = 200;
+  const client_count = 1;
   const spawn_count = 100;
 
-  let start = Date.now();
-  const clients = await Promise.all(
+  await Promise.all(
     Array.from({ length: client_count }, async () => {
-      const id = 'test' + getIdNumber();
+      const id = 'test1'
       const password = '1234';
       const client = new Client(id, password);
       await client.loginRequestTest();
-      return client;
-    }),
-  );
-  let end = Date.now();
-  const loginTestTime = (end - start) / 1000;
-  await delay(3000);
-  start = Date.now();
-  await Promise.all(clients.map((client) => client.matchRequestTest()));
-  end = Date.now();
-  const matchTestTime = (end - start) / 1000;
-  await delay(3000);
+    }));
+  // );
+  // let end = Date.now();
+  // const loginTestTime = (end - start) / 1000;
+  // await delay(3000);
+  // start = Date.now();
+  // await Promise.all(clients.map((client) => client.matchRequestTest()));
+  // end = Date.now();
+  // const matchTestTime = (end - start) / 1000;
+  // await delay(3000);
 
-  start = Date.now();
-  for (let i = 0; i < spawn_count; i++) {
-    await Promise.all(
-      clients.map((client) => {
-        if (client.isConnected) return client.spawnMonsterRequestTest();
-      }),
-    );
-    await delay(1000);
-  }
-  end = Date.now();
-  const gameTestTime = (end - start) / 1000;
+  // start = Date.now();
+  // for (let i = 0; i < spawn_count; i++) {
+  //   await Promise.all(
+  //     clients.map((client) => {
+  //       if (client.isConnected) return client.spawnMonsterRequestTest();
+  //     }),
+  //   );
+  //   await delay(1000);
+  // }
+  // end = Date.now();
+  // const gameTestTime = (end - start) / 1000;
 
-  console.log(`테스트 클라이언트 수 : ${client_count}`);
-  console.log(`테스트 소환 횟수 : ${spawn_count}`);
-  console.log(`로그인 테스트 소요 시간 : ${loginTestTime}`);
-  console.log(`매칭 테스트 소요 시간 : ${matchTestTime}`);
-  console.log(`테스트 소요 시간 : ${gameTestTime}`);
-  console.log('부하테스트 완료');
+  // console.log(`테스트 클라이언트 수 : ${client_count}`);
+  // console.log(`테스트 소환 횟수 : ${spawn_count}`);
+  // console.log(`로그인 테스트 소요 시간 : ${loginTestTime}`);
+  // console.log(`매칭 테스트 소요 시간 : ${matchTestTime}`);
+  // console.log(`테스트 소요 시간 : ${gameTestTime}`);
+  // console.log('부하테스트 완료');
 }
 
 // 시퀀스 조작 테스트
